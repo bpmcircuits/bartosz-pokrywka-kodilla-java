@@ -46,21 +46,25 @@ class WeatherForecastTestSuite {
 
     @Test
     void testCalculateAverageTemp() {
-
+        //Given
         WeatherForecast weatherForecast = new WeatherForecast(temperaturesMock);
 
+        //When
         double averageTemperature = weatherForecast.calculateAverageTemperature();
 
+        //Then
         Assertions.assertEquals(25.56, averageTemperature);
     }
 
     @Test
     void testCalculateMedianTemp() {
-
+        //Given
         WeatherForecast weatherForecast = new WeatherForecast(temperaturesMock);
 
+        //When
         double averageTemperature = weatherForecast.calculateMedianTemperature();
 
+        //Then
         Assertions.assertEquals(25.5, averageTemperature);
 
     }
