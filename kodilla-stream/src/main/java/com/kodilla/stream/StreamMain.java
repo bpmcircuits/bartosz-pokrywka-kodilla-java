@@ -25,9 +25,10 @@ public class StreamMain {
         PoemBeautifier poemBeautifier = new PoemBeautifier();
 
         String textToBeautify = "This is a text for this experiment.";
+        String textToBeautify2 = "Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo.";
 
         System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.repeat(3)));
-        System.out.println(poemBeautifier.beautify(textToBeautify, String::toUpperCase));
+        System.out.println(poemBeautifier.beautify(textToBeautify2, String::toUpperCase));
         System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.replace("t", "T")));
         System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.substring(8, 18)));
     }
