@@ -1,6 +1,4 @@
 package com.kodilla.testing.forum.statistics;
-
-import java.util.HashMap;
 import java.util.Map;
 
 public class ForumStatistics {
