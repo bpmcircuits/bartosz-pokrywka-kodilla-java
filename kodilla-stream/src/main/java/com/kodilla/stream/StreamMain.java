@@ -2,6 +2,7 @@ package com.kodilla.stream;
 
 import com.kodilla.stream.beautifier.PoemBeautifier;
 import com.kodilla.stream.beautifier.PoemDecorator;
+import com.kodilla.stream.iterate.NumbersGenerator;
 import com.kodilla.stream.lambda.ExpressionExecutor;
 import com.kodilla.stream.lambda.Processor;
 import com.kodilla.stream.reference.FunctionalCalculator;
@@ -22,14 +23,17 @@ public class StreamMain {
 //        expressionExecutor.executeExpression(3, 6, FunctionalCalculator::multiplyAByB);
 //        expressionExecutor.executeExpression(3, 6, FunctionalCalculator::divideAByB);
 
-        PoemBeautifier poemBeautifier = new PoemBeautifier();
+//        PoemBeautifier poemBeautifier = new PoemBeautifier();
+//
+//        String textToBeautify = "This is a text for this experiment.";
+//        String textToBeautify2 = "Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo.";
+//
+//        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.repeat(3)));
+//        System.out.println(poemBeautifier.beautify(textToBeautify2, String::toUpperCase));
+//        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.replace("t", "T")));
+//        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.substring(8, 18)));
 
-        String textToBeautify = "This is a text for this experiment.";
-        String textToBeautify2 = "Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo.";
-
-        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.repeat(3)));
-        System.out.println(poemBeautifier.beautify(textToBeautify2, String::toUpperCase));
-        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.replace("t", "T")));
-        System.out.println(poemBeautifier.beautify(textToBeautify, text -> text.substring(8, 18)));
+        System.out.println("Using Stream to generate even numbers from 1 to 20");
+        NumbersGenerator.generateEven(20);
     }
 }
