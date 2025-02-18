@@ -62,7 +62,7 @@ public class Opponent {
     private static Shape win(Shape player) {
         if (player instanceof Rock) return new Paper();
         if (player instanceof Paper) return new Scissors();
-        return new Rock(); // Jeśli gracz wybrał Nożyce, komputer wybiera Kamień
+        return new Rock();
     }
 
     private static Shape draw(Shape player) {

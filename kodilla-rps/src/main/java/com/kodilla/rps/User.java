@@ -7,7 +7,7 @@ public class User {
 
     private final String username;
     private final int amountOfRoundsToWin;
-    private List<Boolean> userWonRounds = new ArrayList<>();
+    private final List<Boolean> userWonRounds = new ArrayList<>();
 
     public User(String username, int amountOfRoundsToWin) {
         this.username = username;

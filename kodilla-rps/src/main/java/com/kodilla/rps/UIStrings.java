@@ -15,7 +15,7 @@ public class UIStrings {
                         key x – end the game \s
                         key n – start a new game
                         """;
-    public static String OPTION = "Option: ";
+    public static String OPTION = "Choose an option: ";
     public static String YOUR_CHOICE = "Your choice is ";
     public static String OPPONENT_CHOICE = "Your opponent choice is ";
     public static String USER_WON = "You won this round";
