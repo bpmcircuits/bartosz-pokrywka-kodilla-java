@@ -22,17 +22,12 @@ public class Flyinder {
         airports.put("Edwards Air Force Base", false);
     }
 
-    public String findFlight(Flight flight) throws RouteNotFoundException {
+    public boolean findFlight(Flight flight) throws RouteNotFoundException {
 
         if (airports.containsKey(flight.getDepartureAirport())
                 && airports.containsKey(flight.getArrivalAirport())) {
-            if (airports.get(flight.getDepartureAirport()).equals(true)
-                    && airports.get(flight.getArrivalAirport()).equals(true)) {
-                return "Route found!";
-            } else {
-                throw new RouteNotFoundException("Airports may not be available!");
-            }
-
+            return airports.get(flight.getDepartureAirport()).equals(true)
+                    && airports.get(flight.getArrivalAirport()).equals(true);
         } else {
             throw new RouteNotFoundException("Route not found! - "
                     + flight.getDepartureAirport() + " - " + flight.getArrivalAirport());

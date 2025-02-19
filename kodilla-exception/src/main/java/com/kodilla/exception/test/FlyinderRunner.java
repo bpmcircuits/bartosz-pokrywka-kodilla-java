@@ -23,7 +23,8 @@ public class FlyinderRunner {
 
     private static String processFlight(Flyinder flyinder, Flight flight) {
         try {
-            return flyinder.findFlight(flight);
+            if (flyinder.findFlight(flight)) return "Route found!";
+            else return "Route not available.";
         } catch (RouteNotFoundException e) {
             return "Error: " + e.getMessage();
         }
