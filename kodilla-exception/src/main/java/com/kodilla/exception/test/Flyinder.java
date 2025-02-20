@@ -33,5 +33,4 @@ public class Flyinder {
                     + flight.getDepartureAirport() + " - " + flight.getArrivalAirport());
         }
     }
-
 }
