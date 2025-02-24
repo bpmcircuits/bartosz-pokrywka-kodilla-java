@@ -1,7 +1,5 @@
 package com.kodilla.checkers.figures;
 
-import com.kodilla.checkers.logic.FigureColor;
-
 public class Pawn implements Figure {
 
     private final FigureColor color;

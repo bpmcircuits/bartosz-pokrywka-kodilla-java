@@ -1,6 +1,7 @@
 package com.kodilla.checkers.logic;
 
 import com.kodilla.checkers.figures.Figure;
+import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.figures.None;
 import com.kodilla.checkers.figures.Pawn;
 
