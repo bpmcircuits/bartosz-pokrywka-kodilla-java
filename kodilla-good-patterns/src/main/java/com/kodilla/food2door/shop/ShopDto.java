@@ -1,4 +1,4 @@
-package com.kodilla.food2door;
+package com.kodilla.food2door.shop;
 
 import java.util.Objects;
 

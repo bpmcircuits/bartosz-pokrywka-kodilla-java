@@ -1,5 +1,9 @@
 package com.kodilla.food2door;
 
+import com.kodilla.food2door.information.DiscordService;
+import com.kodilla.food2door.order.OrderService;
+import com.kodilla.food2door.product.ProductOrder;
+import com.kodilla.food2door.shop.*;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalTime;
@@ -8,78 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FoodDistributionServiceTestSuite {
 
-    private Product product;
-
-    @BeforeEach
-    void setUp() {
-        product = new Product("Vegetable Products", 100);
-    }
-
-    @DisplayName("Tests for Product class")
-    @Nested
-    class ProductClass {
-
-        @Test
-        void testGetProductType() {
-            //given
-            //when
-            String actual = product.getProductType();
-            //then
-            assertEquals("Vegetable Products", actual);
-
-        }
-
-        @Test
-        void testGetProductAmount() {
-            //given
-            //when
-            int actual = product.getAmount();
-            //then
-            assertEquals(100, actual);
-        }
-    }
-
-    @DisplayName("Tests for Shop abstract class")
-    @Nested
-    class ShopAbstractClass {
-
-        private Courier extraFoodShop;
-
-        @BeforeEach
-        void setUp() {
-            extraFoodShop = new ExtraFoodShop(LocalTime.now());
-        }
-
-        @Test
-        void testGetShopName() {
-            //given
-            //when
-            String actual = extraFoodShop.getName();
-            //then
-            assertEquals("Extra Food Shop", actual);
-        }
-
-        @Test
-        void testShopGetProduct() {
-            //given
-            //when
-            Product actual = extraFoodShop.getProduct();
-            //then
-            assertEquals(product, actual);
-        }
-
-    }
-
     @DisplayName("Tests for Courier Process method with time")
     @Nested
-    class CourierProcessMethod {
+    class ShopProcessMethod {
 
         @Test
         void testCourierProcessMethodWhenTimeIsBefore() {
             //given
-            Courier extraFoodShop = new ExtraFoodShop(LocalTime.parse("11:00"));
+            ExtraFoodShop extraFoodShop = new ExtraFoodShop();
+            ProductOrder order = new ProductOrder(
+                    extraFoodShop.getProduct().getProductType(),
+                    extraFoodShop.getName(), 150, LocalTime.parse("11:00"));
             //when
-            boolean actual = extraFoodShop.process();
+            boolean actual = extraFoodShop.process(order);
             //then
             assertTrue(actual);
         }
@@ -87,9 +32,12 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testCourierProcessMethodWhenTimeIsAfter() {
             //given
-            Courier extraFoodShop = new ExtraFoodShop(LocalTime.parse("13:00"));
+            ExtraFoodShop extraFoodShop = new ExtraFoodShop();
+            ProductOrder order = new ProductOrder(
+                    extraFoodShop.getProduct().getProductType(),
+                    extraFoodShop.getName(), 150, LocalTime.parse("13:00"));
             //when
-            boolean actual = extraFoodShop.process();
+            boolean actual = extraFoodShop.process(order);
             //then
             assertFalse(actual);
         }
@@ -102,7 +50,7 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testGetDisplayInfo() {
             //given
-            Courier extraFoodShop = new ExtraFoodShop(LocalTime.parse("13:00"));
+            ExtraFoodShop extraFoodShop = new ExtraFoodShop();
             ShopInfo shopInfo = new ShopInfo(extraFoodShop);
             //when
             String actual = shopInfo.toString();
@@ -119,8 +67,11 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testShopDto() {
             //given
-            Courier extraFoodShop = new ExtraFoodShop(LocalTime.parse("11:00"));
-            boolean isTransactionDone = extraFoodShop.process();
+            ExtraFoodShop extraFoodShop = new ExtraFoodShop();
+            ProductOrder order = new ProductOrder(extraFoodShop.getProduct().getProductType(),
+                    extraFoodShop.getName(), 150, LocalTime.parse("11:00"));
+
+            boolean isTransactionDone = extraFoodShop.process(order);
             ShopDto shopDto = new ShopDto(extraFoodShop.getName(), isTransactionDone);
             //when
             String actualCourier = shopDto.getCourierName();
@@ -132,6 +83,44 @@ public class FoodDistributionServiceTestSuite {
         }
     }
 
+    @DisplayName("Tests for Order class")
+    @Nested
+    class OrderClass {
+
+        ProductOrder order, orderWithProductArgument;
+
+        @BeforeEach
+        void setUp() {
+            order = new ProductOrder("Extra Food Shop", 50);
+            orderWithProductArgument = new ProductOrder(
+                    "Vegetable Products", "Extra Food Shop", 50);
+        }
+
+        @Test
+        void testOrderShopName() {
+            //when
+            String actual = order.getShopName();
+            //then
+            assertEquals("Extra Food Shop", actual);
+        }
+
+        @Test
+        void testOrderAmount() {
+            //when
+            int actual = order.getAmount();
+            //then
+            assertEquals(50, actual);
+        }
+
+        @Test
+        void testOrderProductType() {
+            //when
+            String actual = orderWithProductArgument.getProductType();
+            //then
+            assertEquals("Vegetable Products", actual);
+        }
+    }
+
     @DisplayName("Tests for OrderService class")
     @Nested
     class OrderServiceClass {
@@ -139,12 +128,12 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testOrderServiceEFS() {
             //given
-            Courier extraFoodShop = new ExtraFoodShop(LocalTime.parse("11:00"));
-            ShopDto shopDto = new ShopDto(extraFoodShop.getName(), true);
-
-            OrderService orderService = new OrderService(extraFoodShop, new DiscordService());
+            ProductOrder order = new ProductOrder("Vegetable Products",
+                    "Extra Food Shop", 150, LocalTime.parse("11:00"));
+            OrderService orderService = new OrderService(new DiscordService());
+            ShopDto shopDto = new ShopDto(order.getShopName(), true);
             //when
-            ShopDto actual = orderService.order();
+            ShopDto actual = orderService.order(order);
             //then
             assertEquals(shopDto, actual);
         }
@@ -152,12 +141,11 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testOrderServiceHS() {
             //given
-            Courier healthyShop = new HealthyShop(160);
-            ShopDto shopDto = new ShopDto(healthyShop.getName(), true);
-
-            OrderService orderService = new OrderService(healthyShop, new DiscordService());
+            ProductOrder order = new ProductOrder("Healthy Shop", 160);
+            OrderService orderService = new OrderService(new DiscordService());
+            ShopDto shopDto = new ShopDto(order.getShopName(), true);
             //when
-            ShopDto actual = orderService.order();
+            ShopDto actual = orderService.order(order);
             //then
             assertEquals(shopDto, actual);
         }
@@ -165,17 +153,13 @@ public class FoodDistributionServiceTestSuite {
         @Test
         void testOrderServiceGFS() {
             //given
-            Courier glutenFreeShop = new GlutenFreeShop(10);
-            ShopDto shopDto = new ShopDto(glutenFreeShop.getName(), true);
-
-            OrderService orderService = new OrderService(glutenFreeShop, new DiscordService());
+            ProductOrder order = new ProductOrder("Gluten Free Shop", 30);
+            OrderService orderService = new OrderService(new DiscordService());
+            ShopDto shopDto = new ShopDto(order.getShopName(), true);
             //when
-            ShopDto actual = orderService.order();
+            ShopDto actual = orderService.order(order);
             //then
             assertEquals(shopDto, actual);
         }
     }
-
-
-
 }

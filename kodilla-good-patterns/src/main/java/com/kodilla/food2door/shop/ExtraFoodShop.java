@@ -1,16 +1,14 @@
-package com.kodilla.food2door;
+package com.kodilla.food2door.shop;
+
+import com.kodilla.food2door.product.Product;
+import com.kodilla.food2door.product.ProductOrder;
 
 import java.time.LocalTime;
 
-public class ExtraFoodShop implements Courier {
+public class ExtraFoodShop implements Shop {
 
     private final Product product = new Product("Vegetable Products", 100);
     private final LocalTime deliveryTime = LocalTime.parse("12:00");
-    private final LocalTime time;
-
-    public ExtraFoodShop(LocalTime time) {
-        this.time = time;
-    }
 
     @Override
     public Product getProduct() {
@@ -23,7 +21,7 @@ public class ExtraFoodShop implements Courier {
     }
 
     @Override
-    public boolean process() {
-        return time.isBefore(deliveryTime);
+    public boolean process(ProductOrder productOrder) {
+        return productOrder.getTimeStamp().isBefore(deliveryTime);
     }
 }

@@ -1,14 +1,12 @@
-package com.kodilla.food2door;
+package com.kodilla.food2door.shop;
 
-public class HealthyShop implements Courier {
+import com.kodilla.food2door.product.Product;
+import com.kodilla.food2door.product.ProductOrder;
+
+public class HealthyShop implements Shop {
 
     private final static int AMOUNT = 150;
     private final Product product = new Product("Healthy products", AMOUNT);
-    private final int orderedAmount;
-
-    public HealthyShop(int orderedAmount) {
-        this.orderedAmount = orderedAmount;
-    }
 
     @Override
     public Product getProduct() {
@@ -21,7 +19,7 @@ public class HealthyShop implements Courier {
     }
 
     @Override
-    public boolean process() {
-        return orderedAmount > AMOUNT;
+    public boolean process(ProductOrder productOrder) {
+        return productOrder.getAmount() > AMOUNT;
     }
 }
