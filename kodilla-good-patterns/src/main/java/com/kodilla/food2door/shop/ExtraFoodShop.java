@@ -2,12 +2,13 @@ package com.kodilla.food2door.shop;
 
 import com.kodilla.food2door.product.Product;
 import com.kodilla.food2door.product.ProductOrder;
+import com.kodilla.food2door.product.VegetableProducts;
 
 import java.time.LocalTime;
 
 public class ExtraFoodShop implements Shop {
 
-    private final Product product = new Product("Vegetable Products", 100);
+    private final Product product = new VegetableProducts(100);
     private final LocalTime deliveryTime = LocalTime.parse("12:00");
 
     @Override
