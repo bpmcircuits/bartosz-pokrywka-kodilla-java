@@ -1,33 +1,36 @@
 package com.kodilla.checkers.logic;
 
+import java.awt.*;
+import java.util.Objects;
+
 public class Move {
 
-    private final int fromCol;
-    private final int fromRow;
-    private final int toCol;
-    private final int toRow;
+    private final Point from;
+    private final Point to;
 
-    public Move(int fromCol, int fromRow, int toCol, int toRow) {
-        this.fromCol = fromCol;
-        this.fromRow = fromRow;
-        this.toCol = toCol;
-        this.toRow = toRow;
+    public Move(Point from, Point to) {
+        this.from = from;
+        this.to = to;
     }
 
-    public int getFromCol() {
-        return fromCol;
+    public Point getFromPoint() {
+        return from;
     }
 
-    public int getFromRow() {
-        return fromRow;
+    public Point getToPoint() {
+        return to;
     }
 
-    public int getToCol() {
-        return toCol;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Move move = (Move) o;
+        return Objects.equals(from, move.from) && Objects.equals(to, move.to);
     }
 
-    public int getToRow() {
-        return toRow;
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to);
     }
 }
 

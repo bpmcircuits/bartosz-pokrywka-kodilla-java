@@ -19,12 +19,11 @@ public class BoardRow {
         return cols;
     }
 
-    @Override
-    public String toString() {
-        String s = "|";
+    public String toString(int row) {
+        String s = row + " |";
         for (int col = 0; col < 8; col++)
             s += cols.get(col) + "|";
-        s += "\n";
+        s += " " + row + "\n";
         return s;
     }
 }
