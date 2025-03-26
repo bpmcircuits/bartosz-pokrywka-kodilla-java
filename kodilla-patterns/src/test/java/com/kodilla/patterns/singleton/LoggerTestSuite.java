@@ -22,9 +22,10 @@ class LoggerTestSuite {
     @Test
     void testLoggerEqualsAnotherLogger() {
         //given
-        Logger logger2 =  Logger.LOGGER;
         logger = Logger.LOGGER;
-        //when then
+        //when
+        Logger logger2 =  Logger.LOGGER;
+        //then
         assertEquals(logger2, logger);
     }
 
