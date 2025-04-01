@@ -1,5 +1,7 @@
 package com.kodilla.checkers.ui;
 
+import com.kodilla.checkers.figures.Figure;
+import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.logic.Move;
 
 import java.awt.*;
@@ -9,62 +11,51 @@ public class UserInterface {
 
     private static Scanner scanner = new Scanner(System.in);
 
-    public static int mainMenuChoice() {
-        int menuChoice = -1;
+    public static MenuEnum.MainMenuOption mainMenuChoice() {
         System.out.println(UIStrings.MAIN_MENU);
-        boolean validInput = false;
-        while (!validInput) {
+        while (true) {
             try {
                 System.out.print(UIStrings.OPTION);
                 String input = scanner.nextLine().trim();
-                menuChoice = Integer.parseInt(input);
-                if (menuChoice < 1 || menuChoice > 2) {
-                    System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_TWO);
-                    continue;
+                switch (input) {
+                    case "1": return MenuEnum.MainMenuOption.NEW_GAME;
+                    case "2": return MenuEnum.MainMenuOption.EXIT;
+                    default: System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_TWO);
                 }
-                validInput = true;
             } catch (NumberFormatException e) {
                 System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_TWO);
             }
         }
-        return menuChoice;
     }
 
     public static boolean onExit() {
-        boolean validOption = false;
-        while (!validOption) {
+        while (true) {
             System.out.print(UIStrings.ON_QUIT);
-            String userExitQ = scanner.nextLine().trim();
-            if (!userExitQ.equals("yes") && !userExitQ.equals("no")) {
-                System.out.println(UIStrings.WRONG_OPTION);
-                continue;
+            String input = scanner.nextLine().trim();
+            switch (input) {
+                case "yes": return true;
+                case "no": return false;
+                default: System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_TWO);
             }
-            if (userExitQ.equals("no")) return false;
-            validOption = true;
         }
-        return true;
     }
 
-    public static int newGameMenu() {
-
-        int menuChoice = -1;
+    public static MenuEnum.NewGameMenuOption newGameMenu() {
         System.out.println(UIStrings.NEW_GAME_MENU);
-        boolean validInput = false;
-        while (!validInput) {
+        while (true) {
             try {
                 System.out.print(UIStrings.OPTION);
                 String input = scanner.nextLine().trim();
-                menuChoice = Integer.parseInt(input);
-                if (menuChoice < 1 || menuChoice > 3) {
-                    System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_THREE);
-                    continue;
+                switch (input) {
+                    case "1": return MenuEnum.NewGameMenuOption.PLAYER_VS_PLAYER;
+                    case "2": return MenuEnum.NewGameMenuOption.PLAYER_VS_COMPUTER;
+                    case "3": return MenuEnum.NewGameMenuOption.BACK;
+                    default: System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_THREE);
                 }
-                validInput = true;
             } catch (NumberFormatException e) {
                 System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_THREE);
             }
         }
-        return menuChoice;
     }
 
     public static String choosePlayerName(Settings.PLAYER player) {
@@ -72,21 +63,16 @@ public class UserInterface {
         return scanner.nextLine().trim();
     }
 
-    public static String chooseFigure() {
-        String figure = "";
-
-        boolean validFigure = false;
-        while (!validFigure) {
+    public static FigureColor chooseFigureColor() {
+        while (true) {
             System.out.println(UIStrings.CHOOSE_FIGURE);
-            figure = scanner.nextLine().trim().toUpperCase();
-
-            if (figure.equals("B") || figure.equals("W")) {
-                validFigure = true;
-            } else {
-                System.out.println(UIStrings.WRONG_OPTION);
+            String input = scanner.nextLine().trim().toUpperCase();
+            switch (input) {
+                case "B": return FigureColor.BLACK;
+                case "W": return FigureColor.WHITE;
+                default: System.out.println(UIStrings.WRONG_OPTION);
             }
         }
-        return figure;
     }
 
     public static void displayPlayers(String playerOne, String playerTwo) {
@@ -95,24 +81,17 @@ public class UserInterface {
 
 
     public static MenuEnum.ComputerLevelEnum chooseComputerLevel() {
-        int levelChoice = -1;
-        boolean validComputerLevel = false;
-        while (!validComputerLevel) {
+        while (true) {
             System.out.println(UIStrings.COMPUTER_LEVEL);
             System.out.print(UIStrings.OPTION);
             String input = scanner.nextLine().trim();
-            try {
-                levelChoice = Integer.parseInt(input);
-                if (levelChoice < 1 || levelChoice > 2) {
+            switch (input) {
+                case "1": return MenuEnum.ComputerLevelEnum.EASY;
+                case "2": return MenuEnum.ComputerLevelEnum.HARD;
+                default:
                     System.out.println(UIStrings.CHOOSE_RIGHT_OPTION_ONE_TWO);
-                    continue;
-                }
-                validComputerLevel = true;
-            } catch (NumberFormatException e) {
-                System.out.println(UIStrings.WRONG_OPTION);
             }
         }
-        return levelChoice == 1 ? MenuEnum.ComputerLevelEnum.EASY : MenuEnum.ComputerLevelEnum.HARD;
     }
 
     public static void showWhichPlayerTurn(String playerName) {
@@ -120,17 +99,14 @@ public class UserInterface {
     }
 
     public static Move getPlayerMove() {
-        String move = "";
-        boolean validPlace = false;
-        while (!validPlace) {
+        while (true) {
             System.out.print(UIStrings.PLACE_YOUR_MOVE);
-            move = scanner.nextLine().trim();
-            if (isCorrectMoveName(move)) {
-                validPlace = true;
+            String input = scanner.nextLine().trim();
+            if (isCorrectMoveName(input)) {
+                return takeMove(input);
             }
             else System.out.println(UIStrings.WRONG_MOVE_NAME);
         }
-        return takeMove(move);
     }
 
     public static void showWinner(String playerName) {
@@ -145,28 +121,10 @@ public class UserInterface {
         System.out.println(UIStrings.ILLEGAL_MOVE);
     }
 
-    private static boolean isCorrectPositionName(String position) {
-        if (position == null || position.length() < 2) {
-            return false;
-        }
-        char colChar = position.charAt(0);
-        if (colChar < 'A' || colChar > ('A' + Settings.BOARD_SIZE - 1)) {
-            return false;
-        }
-        String rowPart = position.substring(1);
-        try {
-            int row = Integer.parseInt(rowPart);
-            return row >= 1 && row <= Settings.BOARD_SIZE;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     private static boolean isCorrectMoveName(String move) {
         if (move == null || move.length() < 4) {
             return false;
         }
-
         return move.matches("^[A-H][1-8][A-H][1-8]$");
     }
 

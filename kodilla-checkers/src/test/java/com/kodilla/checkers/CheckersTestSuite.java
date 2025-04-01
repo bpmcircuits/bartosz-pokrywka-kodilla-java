@@ -110,7 +110,7 @@ public class CheckersTestSuite {
             System.out.println(board);
 
             //when
-            boolean actual = board.findAndAttackOpponents(move);
+            boolean actual = board.showAndAttackOpponents(move);
             board.move(move);
 
             //then
@@ -128,7 +128,7 @@ public class CheckersTestSuite {
             System.out.println(board);
 
             //when
-            boolean actual = board.findAndAttackOpponents(move);
+            boolean actual = board.showAndAttackOpponents(move);
             board.move(move);
 
             //then
