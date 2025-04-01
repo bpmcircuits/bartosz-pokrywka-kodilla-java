@@ -40,18 +40,18 @@ public class GameLogic {
 
         UserInterface.displayPlayers(playerOne.getName(), playerTwo.getName());
 
-        Board board = new Board().init(playerOne, playerTwo);
+        Board board = new Board(playerOne, playerTwo).init();
 
         while (true) {
             System.out.println(board);
             UserInterface.showWhichPlayerTurn(board.getCurrentPlayer().getName());
 
-            if (!handlePlayerMove(board.getCurrentPlayer(), board)) {
+            if (!isPlayerMoveHandled(board.getCurrentPlayer(), board)) {
                 continue;
             }
 
             if (board.checkWinner() != null) {
-                UserInterface.showWinner(board.getCurrentPlayer().getName());
+                UserInterface.showWinner(board.showWinner().getName());
                 return;
             }
 
@@ -59,15 +59,8 @@ public class GameLogic {
         }
     }
 
-    private boolean handlePlayerMove(Player player, Board board) {
+    private boolean isPlayerMoveHandled(Player player, Board board) {
         Move move = player.getMove(board);
-        if (!board.isLegalMove(move)) {
-            UserInterface.illegalMove();
-            return false;
-        }
-
-        board.showAndAttackOpponents(move);
-        board.moveFigure(move);
-        return true;
+        return board.moveFigure(move);
     }
 }

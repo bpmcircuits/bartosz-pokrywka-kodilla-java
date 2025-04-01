@@ -4,16 +4,23 @@ import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.figures.Pawn;
 import com.kodilla.checkers.logic.Board;
 import com.kodilla.checkers.logic.Move;
+import com.kodilla.checkers.player.HumanPlayer;
+import com.kodilla.checkers.player.Player;
 import com.kodilla.checkers.ui.UserInterface;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CheckersTestSuite {
+
+    private static Player[] players;
+
+    @BeforeEach
+    void setUp() {
+        players = new Player[]{new HumanPlayer("test", FigureColor.WHITE), new HumanPlayer("test", FigureColor.BLACK)};
+    }
 
     @Test
     void testCorrectNameToPointTranslation() {
@@ -46,7 +53,7 @@ public class CheckersTestSuite {
         @Test
         void testEmptyPlaceOnBoard() {
             //given
-            Board board = new Board();
+            Board board = new Board(players[0], players[1]);
             board.init();
             //when
             boolean actual = board.isPlaceEmpty(new Point(0, 0));
@@ -58,7 +65,7 @@ public class CheckersTestSuite {
         @Test
         void testNotEmptyPlaceOnBoard() {
             //given
-            Board board = new Board();
+            Board board = new Board(players[0], players[1]);
             board.init();
             //when
             boolean actual = board.isPlaceEmpty(new Point(1, 0));
@@ -74,7 +81,7 @@ public class CheckersTestSuite {
         @Test
         void testNonDiagonalMove() {
             //given
-            Board board = new Board();
+            Board board = new Board(players[0], players[1]);
             board.init();
             //when
             Move moveX = new Move(new Point(0, 0), new Point(1, 0));
@@ -90,7 +97,7 @@ public class CheckersTestSuite {
         @Test
         void testDiagonalMove() {
             //given
-            Board board = new Board();
+            Board board = new Board(players[0], players[1]);
             board.init();
             //when
             Move move = new Move(new Point(0, 0), new Point(1, 1));
@@ -103,15 +110,15 @@ public class CheckersTestSuite {
         @Test
         void testFindAndAttackWithSuccess() {
             //given
-            Board board = new Board();
-            board.setFigure(new Point(0, 6), new Pawn(FigureColor.WHITE));
+            Board board = new Board(players[0], players[1]);
+            board.setFigure(new Point(2, 4), new Pawn(FigureColor.WHITE));
             board.setFigure(new Point(3, 3), new Pawn(FigureColor.BLACK));
             Move move = new Move(new Point(0, 6), new Point(4, 2));
             System.out.println(board);
 
             //when
             boolean actual = board.showAndAttackOpponents(move);
-            board.move(move);
+            board.moveFigure(move);
 
             //then
             System.out.println(board);
@@ -121,7 +128,7 @@ public class CheckersTestSuite {
         @Test
         void testFindAndAttackWithNoSuccess() {
             //given
-            Board board = new Board();
+            Board board = new Board(players[0],players[1]) ;
             board.setFigure(new Point(0, 6), new Pawn(FigureColor.WHITE));
             board.setFigure(new Point(3, 3), new Pawn(FigureColor.BLACK));
             Move move = new Move(new Point(0, 6), new Point(2, 4));
@@ -129,7 +136,7 @@ public class CheckersTestSuite {
 
             //when
             boolean actual = board.showAndAttackOpponents(move);
-            board.move(move);
+            board.moveFigure(move);
 
             //then
             System.out.println(board);

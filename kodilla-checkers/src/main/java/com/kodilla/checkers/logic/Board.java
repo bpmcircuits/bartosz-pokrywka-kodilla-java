@@ -2,6 +2,7 @@ package com.kodilla.checkers.logic;
 
 import com.kodilla.checkers.figures.*;
 import com.kodilla.checkers.player.Player;
+import com.kodilla.checkers.ui.UserInterface;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,17 +12,20 @@ public class Board {
 
     private final List<BoardRow> rows = new ArrayList<>();
     private Player currentPlayer;
-    private Player playerOne;
-    private Player playerTwo;
+    private final Player playerOne;
+    private final Player playerTwo;
     private FigureColor winner = null;
     private int whiteFigures = 0;
     private int blackFigures = 0;
     private final List<Figure> capturedWhiteFigures = new ArrayList<>();
     private final List<Figure> capturedBlackFigures = new ArrayList<>();
 
-    public Board() {
+    public Board(Player playerOne, Player playerTwo) {
         for (int row = 0; row < 8; row++)
             rows.add(new BoardRow());
+        this.playerOne = playerOne;
+        this.playerTwo = playerTwo;
+        currentPlayer = playerOne;
     }
 
     public Figure getFigure(Point point) {
@@ -34,14 +38,21 @@ public class Board {
         rows.get(point.y).getCols().set(point.x, figure);
     }
 
-    public void moveFigure(Move move) {
-        if (move == null) return;
+    public boolean moveFigure(Move move) {
+        if (move == null) return false;
+        if (!isLegalMove(move)) {
+            UserInterface.illegalMove();
+            return false;
+        }
+        showAndAttackOpponents(move);
         Figure figure = getFigure(move.getFromPoint());
         setFigure(move.getToPoint(), figure);
         setFigure(move.getFromPoint(), new None());
+        setPawnToQueen(move.getToPoint(), currentPlayer.getFigureColor());
+        return true;
     }
 
-    public Board init(Player playerOne, Player playerTwo) {
+    public Board init() {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 Point p = new Point(x, y);
@@ -56,9 +67,6 @@ public class Board {
                 }
             }
         }
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
-        currentPlayer = playerOne;
         return this;
     }
 
@@ -168,12 +176,11 @@ public class Board {
             setFigure(point, new Queen(color));
             return true;
         }
-
         return false;
     }
 
-    public FigureColor showWinner() {
-        return winner;
+    public Player showWinner() {
+        return currentPlayer;
     }
 
     public FigureColor checkWinner() {
