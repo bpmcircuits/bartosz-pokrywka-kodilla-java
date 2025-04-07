@@ -1,0 +1,49 @@
+CREATE TABLE ISSUESLISTS
+(
+    ID SERIAL PRIMARY KEY,
+    NAME VARCHAR(100)
+);
+
+CREATE TABLE ISSUES
+(
+    ID SERIAL PRIMARY KEY,
+    ISSUESLIST_ID BIGINT UNSIGNED NOT NULL,
+    SUMMARY VARCHAR(512),
+    DESCRIPTION VARCHAR(2048),
+    USER_ID_ASSIGNEDTO BIGINT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (ISSUESLIST_ID) REFERENCES ISSUESLISTS(ID),
+    FOREIGN KEY (USER_ID_ASSIGNEDTO) REFERENCES USERS(ID)
+);
+
+INSERT INTO ISSUESLISTS (NAME) VALUES ("ToDo");
+INSERT INTO ISSUESLISTS (NAME) VALUES ("In progress");
+INSERT INTO ISSUESLISTS (NAME) VALUES ("Done");
+
+SELECT * FROM ISSUESLISTS;
+
+INSERT INTO ISSUES (ISSUESLIST_ID, SUMMARY, DESCRIPTION, USER_ID_ASSIGNEDTO) VALUES
+-- ToDo (ID = 1)
+(1, 'ToDo: Refactor login module', 'Refactor and clean up the authentication logic.', 1),
+(1, 'ToDo: Update documentation', 'Complete the API reference section.', 2),
+(1, 'ToDo: Add unit tests', 'Add unit tests for the user controller.', 4),
+(1, 'ToDo: Research caching strategies', 'Compare Redis and Memcached.', 2),
+(1, 'ToDo: Create onboarding flow', 'Design onboarding screens for new users.', 3),
+
+-- In progress (ID = 2)
+(2, 'In progress: Fix issue with date picker', 'Date picker breaks in Safari browser.', 2),
+(2, 'In progress: Implement dark mode', 'Dark mode toggle and theme setup.', 1),
+(2, 'In progress: Optimize database queries', 'Reduce latency by optimizing indexes.', 3),
+(2, 'In progress: Migrate to TypeScript', 'Begin with the frontend utilities.', 2),
+(2, 'In progress: Review PR #42', 'Code review for recent bugfixes.', 4),
+
+-- Done (ID = 3)
+(3, 'Done: Setup CI/CD pipeline', 'Configured GitHub Actions and deployments.', 4),
+(3, 'Done: Initial project scaffolding', 'Created base layout and folder structure.', 3),
+(3, 'Done: Linting rules applied', 'Added ESLint and Prettier configs.', 2),
+(3, 'Done: Login screen UI', 'Implemented basic login screen with validation.', 3),
+(3, 'Done: Backend health check', 'Added `/health` endpoint for monitoring.', 1);
+
+SELECT * FROM ISSUES;
+
+COMMIT;
