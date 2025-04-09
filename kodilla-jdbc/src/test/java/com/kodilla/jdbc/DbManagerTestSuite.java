@@ -75,7 +75,7 @@ class DbManagerTestSuite {
                 SELECT U.FIRSTNAME, U.LASTNAME, COUNT(*) AS POST_COUNT
                 FROM USERS U JOIN POSTS P ON U.ID = P.USER_ID
                 GROUP BY U.FIRSTNAME, U.LASTNAME
-                HAVING COUNT(*) > 0
+                HAVING COUNT(*) > 1
                 """;
         Statement statement = dbManager.getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(sqlQuery);
@@ -89,7 +89,7 @@ class DbManagerTestSuite {
         }
         resultSet.close();
         statement.close();
-        assertEquals(3, counter);
+        assertEquals(1, counter);
 
     }
 }
