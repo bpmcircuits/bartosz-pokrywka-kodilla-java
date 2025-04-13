@@ -17,6 +17,16 @@ class MinMax {
         return numbers[numbers.length - 1];
     }
 
+    public int getSecondMin() {
+        if (numbers.length < 1) throw new IllegalArgumentException("There are no more than " + numbers.length + " numbers");
+        return numbers[1];
+    }
+
+    public int getSecondMax() {
+        if (numbers.length < 1) throw new IllegalArgumentException("There are no more than " + numbers.length + " numbers");
+        return numbers[numbers.length - 2];
+    }
+
     private void quickSort(int[] array, int startIndex, int endIndex) {
         if (startIndex < endIndex) {
             int pivotIndex = partition(array, startIndex, endIndex);
@@ -56,5 +66,7 @@ public class Main {
         MinMax minMax = new MinMax(numbers);
         System.out.println(minMax.getMin());
         System.out.println(minMax.getMax());
+        System.out.println(minMax.getSecondMin());
+        System.out.println(minMax.getSecondMax());
     }
 }
