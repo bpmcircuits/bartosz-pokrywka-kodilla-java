@@ -11,10 +11,13 @@ class BigmacTestSuite {
         //given
         Bigmac bigmac = new Bigmac.BigmacBuilder()
                 .bun("sesame")
-                .burgers(2)
                 .sauce("barbecue")
                 .ingredients("pickles")
                 .ingredients("onion")
+                .burgers(1)
+                .bun("plain")
+                .sauce("mayo")
+                .burgers(1)
                 .build();
         System.out.println(bigmac);
         //when

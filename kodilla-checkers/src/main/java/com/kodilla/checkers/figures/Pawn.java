@@ -17,4 +17,9 @@ public class Pawn implements Figure {
     public String toString() {
         return ((color == FigureColor.BLACK) ? "b" : "w") + "P";
     }
+
+    @Override
+    public Figure clone() {
+        return new Pawn(this.color);
+    }
 }

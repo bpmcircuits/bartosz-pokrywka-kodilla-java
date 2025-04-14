@@ -11,4 +11,9 @@ public class None implements Figure {
     public String toString() {
         return "  ";
     }
+
+    @Override
+    public Figure clone() {
+        return new None();
+    }
 }

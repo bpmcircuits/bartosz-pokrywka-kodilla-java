@@ -73,6 +73,31 @@ public class CheckersTestSuite {
             System.out.println(board);
             assertFalse(actual);
         }
+
+        @Test
+        void testSimpleDeepCopy() throws CloneNotSupportedException {
+            //given
+            Board board = new Board(players[0], players[1]);
+            board.init();
+            //when
+            Board deepCopy = board.deepCopy();
+            //then
+            assertEquals(board, deepCopy);
+        }
+
+        @Test
+        void testDeepCopy() throws CloneNotSupportedException {
+            //given
+            Board board = new Board(players[0], players[1]);
+            board.init();
+            //when
+            Board deepCopy = board.deepCopy();
+            board.moveFigure(UserInterface.takeMove("A6B5"));
+            //then
+            System.out.println(board);
+            System.out.println(deepCopy);
+            assertNotEquals(board, deepCopy);
+        }
     }
 
     @DisplayName("Board Move Tests")

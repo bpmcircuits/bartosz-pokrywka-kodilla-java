@@ -7,18 +7,19 @@ import com.kodilla.checkers.ui.UserInterface;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Board {
 
-    private final List<BoardRow> rows = new ArrayList<>();
+    private List<BoardRow> rows = new ArrayList<>();
     private Player currentPlayer;
-    private final Player playerOne;
-    private final Player playerTwo;
+    private Player playerOne;
+    private Player playerTwo;
     private FigureColor winner = null;
     private int whiteFigures = 0;
     private int blackFigures = 0;
-    private final List<Figure> capturedWhiteFigures = new ArrayList<>();
-    private final List<Figure> capturedBlackFigures = new ArrayList<>();
+    private List<Figure> capturedWhiteFigures = new ArrayList<>();
+    private List<Figure> capturedBlackFigures = new ArrayList<>();
 
     public Board(Player playerOne, Player playerTwo) {
         for (int row = 0; row < 8; row++)
@@ -68,6 +69,82 @@ public class Board {
             }
         }
         return this;
+    }
+
+    public Board deepCopy() throws CloneNotSupportedException {
+        Board copy = new Board(playerOne, playerTwo);
+
+        for (int y = 0; y < 8; y++) {
+            BoardRow originalRow = this.rows.get(y);
+            BoardRow copiedRow = new BoardRow();
+
+            for (int x = 0; x < 8; x++) {
+                Figure originalFigure = originalRow.getCols().get(x);
+                copiedRow.getCols().set(x, originalFigure.clone());
+            }
+
+            copy.rows.set(y, copiedRow);
+        }
+
+        copy.currentPlayer = this.currentPlayer;
+        copy.whiteFigures = this.whiteFigures;
+        copy.blackFigures = this.blackFigures;
+        copy.capturedWhiteFigures.addAll(cloneFigures(this.capturedWhiteFigures));
+        copy.capturedBlackFigures.addAll(cloneFigures(this.capturedBlackFigures));
+
+        return copy;
+    }
+
+    private List<Figure> cloneFigures(List<Figure> original) {
+        List<Figure> cloned = new ArrayList<>();
+        for (Figure f : original) {
+            cloned.add(f.clone());
+        }
+        return cloned;
+    }
+
+    public List<Move> getAllLegalMoves(FigureColor color) {
+        List<Move> moves = new ArrayList<>();
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Point from = new Point(col, row);
+                Figure figure = getFigure(from);
+
+                if (figure instanceof None || figure.getColor() != color)
+                    continue;
+
+                for (int destCol = -2; destCol <= 2; destCol++) {
+                    for (int destRow = -2; destRow <= 2; destRow++) {
+                        if (Math.abs(destCol) == Math.abs(destRow) && destCol != 0) {
+                            Point to = new Point(col + destCol, row + destRow);
+                            Move move = new Move(from, to);
+                            if (isLegalMove(move)) {
+                                moves.add(move);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    public int evaluateScore(FigureColor color) {
+        int score = 0;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Figure f = getFigure(new Point(col, row));
+                if (f instanceof None) continue;
+
+                int value = (f instanceof Queen) ? 3 : 1;
+                score += (f.getColor() == color) ? value : -value;
+            }
+        }
+
+        return score;
     }
 
     private boolean shouldPlacePawn(int x, int y, FigureColor color) {
@@ -206,5 +283,21 @@ public class Board {
 
     private boolean isInBounds(Point point) {
         return point != null && point.x >= 0 && point.x < 8 && point.y >= 0 && point.y < 8;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Board board = (Board) o;
+        return Objects.equals(rows, board.rows) && Objects.equals(currentPlayer, board.currentPlayer)
+                && Objects.equals(playerOne, board.playerOne)
+                && Objects.equals(playerTwo, board.playerTwo)
+                && Objects.equals(capturedWhiteFigures, board.capturedWhiteFigures)
+                && Objects.equals(capturedBlackFigures, board.capturedBlackFigures);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rows, currentPlayer, playerOne, playerTwo, capturedWhiteFigures, capturedBlackFigures);
     }
 }

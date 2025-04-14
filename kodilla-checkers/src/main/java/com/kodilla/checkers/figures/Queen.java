@@ -17,4 +17,9 @@ public class Queen implements Figure {
     public String toString() {
         return ((color == FigureColor.BLACK) ? "b" : "w") + "Q";
     }
+
+    @Override
+    public Figure clone() {
+        return new Queen(this.color);
+    }
 }

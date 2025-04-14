@@ -17,6 +17,51 @@ public class ComputerPlayer implements Player {
 
     }
 
+    public Move findBestMove(Board board, int depth) throws CloneNotSupportedException {
+        int bestScore = Integer.MIN_VALUE;
+        Move bestMove = null;
+
+        for (Move move : board.getAllLegalMoves(color)) {
+            Board copy = board.deepCopy();
+            copy.moveFigure(move);
+            copy.switchToNextTurn();
+
+            int score = minimax(copy, depth - 1, false);
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+        }
+
+        return bestMove;
+    }
+
+    private int minimax(Board board, int depth, boolean isMaximizing) throws CloneNotSupportedException {
+        FigureColor currentColor = isMaximizing ? color : getOpponentColor(color);
+
+        if (depth == 0 || board.checkWinner() != null) {
+            return board.evaluateScore(color);
+        }
+
+        int bestScore = isMaximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        for (Move move : board.getAllLegalMoves(currentColor)) {
+            Board copy = board.deepCopy();
+            copy.moveFigure(move);
+            copy.switchToNextTurn();
+
+            int score = minimax(copy, depth - 1, !isMaximizing);
+            bestScore = isMaximizing ? Math.max(bestScore, score) : Math.min(bestScore, score);
+        }
+
+        return bestScore;
+    }
+
+    private FigureColor getOpponentColor(FigureColor color) {
+        return color == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE;
+    }
+
     public FigureColor getFigureColor() {
         return color;
     }
