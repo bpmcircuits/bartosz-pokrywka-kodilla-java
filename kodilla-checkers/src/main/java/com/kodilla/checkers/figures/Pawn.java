@@ -1,5 +1,7 @@
 package com.kodilla.checkers.figures;
 
+import java.util.Objects;
+
 public class Pawn implements Figure {
 
     private final FigureColor color;
@@ -21,5 +23,17 @@ public class Pawn implements Figure {
     @Override
     public Figure clone() {
         return new Pawn(this.color);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Pawn pawn = (Pawn) o;
+        return color == pawn.color;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(color);
     }
 }

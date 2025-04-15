@@ -1,5 +1,6 @@
 package com.kodilla.checkers.logic;
 
+import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.player.Player;
 import com.kodilla.checkers.player.PlayerFactory;
 import com.kodilla.checkers.ui.MenuEnum;
@@ -41,26 +42,27 @@ public class GameLogic {
         UserInterface.displayPlayers(playerOne.getName(), playerTwo.getName());
 
         Board board = new Board(playerOne, playerTwo).init();
+        FigureColor winner = null;
 
-        while (true) {
+        while (winner == null) {
             System.out.println(board);
             UserInterface.showWhichPlayerTurn(board.getCurrentPlayer().getName());
 
-            if (!isPlayerMoveHandled(board.getCurrentPlayer(), board)) {
+            Move move = board.getCurrentPlayer().getMove(board);
+            boolean moveCompleted = board.moveFigure(move);
+
+            if (!moveCompleted) {
                 continue;
             }
 
-            if (board.checkWinner() != null) {
-                UserInterface.showWinner(board.showWinner().getName());
-                return;
-            }
-
-            board.switchToNextTurn();
+            winner = board.checkWinner();
         }
+
+        System.out.println(board);
+        UserInterface.showWinner(getWinningColor(winner, playerOne, playerTwo));
     }
 
-    private boolean isPlayerMoveHandled(Player player, Board board) {
-        Move move = player.getMove(board);
-        return board.moveFigure(move);
+    private static String getWinningColor(FigureColor winner, Player playerOne, Player playerTwo) {
+        return winner == playerOne.getFigureColor() ? playerOne.getName() : playerTwo.getName();
     }
 }

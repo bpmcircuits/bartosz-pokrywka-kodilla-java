@@ -5,54 +5,73 @@ import com.kodilla.checkers.logic.Board;
 import com.kodilla.checkers.logic.Move;
 import com.kodilla.checkers.ui.MenuEnum;
 
+import java.util.List;
+
 public class ComputerPlayer implements Player {
-
+    private static final String AI_NAME = "ENIAC";
     private final FigureColor color;
-    private final MenuEnum.ComputerLevelEnum computerLevel;
-    private static final int MAX_DEPTH = 4;
+    private final MenuEnum.ComputerLevelEnum difficulty;
 
-    public ComputerPlayer(FigureColor color, MenuEnum.ComputerLevelEnum computerLevel) {
+    public ComputerPlayer(FigureColor color, MenuEnum.ComputerLevelEnum difficulty) {
         this.color = color;
-        this.computerLevel = computerLevel;
-
+        this.difficulty = difficulty;
     }
 
-    public Move findBestMove(Board board, int depth) throws CloneNotSupportedException {
+    @Override
+    public Move getMove(Board board) {
+        if (board == null) return null;
+        return findBestMove(board);
+    }
+
+    private Move findBestMove(Board board) {
         int bestScore = Integer.MIN_VALUE;
         Move bestMove = null;
 
         for (Move move : board.getAllLegalMoves(color)) {
-            Board copy = board.deepCopy();
-            copy.moveFigure(move);
-            copy.switchToNextTurn();
+            Board boardCopy = board.deepCopy();
+            boolean captureOccurred = boardCopy.moveFigure(move);
 
-            int score = minimax(copy, depth - 1, false);
+            int score = evaluateMoveScore(boardCopy, captureOccurred, difficulty.level - 1);
 
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = move;
             }
         }
-
         return bestMove;
     }
 
-    private int minimax(Board board, int depth, boolean isMaximizing) throws CloneNotSupportedException {
-        FigureColor currentColor = isMaximizing ? color : getOpponentColor(color);
+    private int evaluateMoveScore(Board board, boolean captureOccurred, int depth) {
+        boolean isMaximizing = !(captureOccurred && board.getForcedMovePosition() != null);
+        return minimax(board, depth, isMaximizing);
+    }
 
+    private int minimax(Board board, int depth, boolean isMaximizing) {
         if (depth == 0 || board.checkWinner() != null) {
+            return board.evaluateScore(color);
+        }
+
+        FigureColor currentColor = isMaximizing ? color : getOpponentColor(color);
+        List<Move> moves = board.getAllLegalMoves(currentColor);
+
+        if (moves.isEmpty()) {
             return board.evaluateScore(color);
         }
 
         int bestScore = isMaximizing ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        for (Move move : board.getAllLegalMoves(currentColor)) {
-            Board copy = board.deepCopy();
-            copy.moveFigure(move);
-            copy.switchToNextTurn();
+        for (Move move : moves) {
+            Board boardCopy = board.deepCopy();
+            boolean captureOccurred = boardCopy.moveFigure(move);
 
-            int score = minimax(copy, depth - 1, !isMaximizing);
-            bestScore = isMaximizing ? Math.max(bestScore, score) : Math.min(bestScore, score);
+            boolean continueWithSamePlayer = captureOccurred && boardCopy.getForcedMovePosition() != null;
+            boolean nextIsMaximizing = continueWithSamePlayer == isMaximizing;
+
+            int score = minimax(boardCopy, depth - 1, nextIsMaximizing);
+
+            bestScore = isMaximizing
+                    ? Math.max(bestScore, score)
+                    : Math.min(bestScore, score);
         }
 
         return bestScore;
@@ -62,16 +81,22 @@ public class ComputerPlayer implements Player {
         return color == FigureColor.WHITE ? FigureColor.BLACK : FigureColor.WHITE;
     }
 
+    @Override
     public FigureColor getFigureColor() {
         return color;
     }
 
     @Override
-    public Move getMove(Board board) {
-        return null;
+    public String getName() {
+        return AI_NAME;
     }
 
-    public String getName() {
-        return "ENIAC";
+    @Override
+    public String toString() {
+        return "ComputerPlayer{" +
+                "name='" + AI_NAME + '\'' +
+                ", color=" + color +
+                ", difficulty=" + difficulty +
+                '}';
     }
 }

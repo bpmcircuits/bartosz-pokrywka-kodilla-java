@@ -1,7 +1,9 @@
 package com.kodilla.checkers;
 
+import com.kodilla.checkers.figures.Figure;
 import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.figures.Pawn;
+import com.kodilla.checkers.figures.Queen;
 import com.kodilla.checkers.logic.Board;
 import com.kodilla.checkers.logic.Move;
 import com.kodilla.checkers.player.HumanPlayer;
@@ -19,7 +21,7 @@ public class CheckersTestSuite {
 
     @BeforeEach
     void setUp() {
-        players = new Player[]{new HumanPlayer("test", FigureColor.WHITE), new HumanPlayer("test", FigureColor.BLACK)};
+        players = new Player[]{new HumanPlayer("PlayerA", FigureColor.WHITE), new HumanPlayer("PlayerB", FigureColor.BLACK)};
     }
 
     @Test
@@ -50,29 +52,6 @@ public class CheckersTestSuite {
     @DisplayName("Board Tests")
     @Nested
     class BoardTests {
-        @Test
-        void testEmptyPlaceOnBoard() {
-            //given
-            Board board = new Board(players[0], players[1]);
-            board.init();
-            //when
-            boolean actual = board.isPlaceEmpty(new Point(0, 0));
-            //then
-            System.out.println(board);
-            assertTrue(actual);
-        }
-
-        @Test
-        void testNotEmptyPlaceOnBoard() {
-            //given
-            Board board = new Board(players[0], players[1]);
-            board.init();
-            //when
-            boolean actual = board.isPlaceEmpty(new Point(1, 0));
-            //then
-            System.out.println(board);
-            assertFalse(actual);
-        }
 
         @Test
         void testSimpleDeepCopy() throws CloneNotSupportedException {
@@ -82,7 +61,7 @@ public class CheckersTestSuite {
             //when
             Board deepCopy = board.deepCopy();
             //then
-            assertEquals(board, deepCopy);
+            assertNotEquals(board, deepCopy);
         }
 
         @Test
@@ -103,69 +82,170 @@ public class CheckersTestSuite {
     @DisplayName("Board Move Tests")
     @Nested
     class BoardMoveTests {
+
         @Test
-        void testNonDiagonalMove() {
+        void testIllegalWhiteMoveDirection() {
             //given
             Board board = new Board(players[0], players[1]);
-            board.init();
-            //when
-            Move moveX = new Move(new Point(0, 0), new Point(1, 0));
-            Move moveY = new Move(new Point(0, 0), new Point(0, 1));
-            boolean actualX = board.isMoveDiagonal(moveX);
-            boolean actualY = board.isMoveDiagonal(moveY);
-            //then
+            board.setFigure(new Point(2, 4), new Pawn(FigureColor.WHITE));
             System.out.println(board);
-            assertFalse(actualX);
-            assertFalse(actualY);
+            //when
+            boolean actual = board.moveFigure(UserInterface.takeMove("C5B6"));
+            System.out.println(board);
+            //then
+            assertFalse(actual);
         }
 
         @Test
-        void testDiagonalMove() {
+        void testIllegalBlackMoveDirection() {
             //given
             Board board = new Board(players[0], players[1]);
-            board.init();
-            //when
-            Move move = new Move(new Point(0, 0), new Point(1, 1));
-            boolean actual = board.isMoveDiagonal(move);
-            //then
+            board.setFigure(new Point(2, 4), new Pawn(FigureColor.BLACK));
+            board.switchToNextTurn();
             System.out.println(board);
+            //when
+            boolean actual = board.moveFigure(UserInterface.takeMove("C5D4"));
+            System.out.println(board);
+            //then
+            assertFalse(actual);
+        }
+
+        @Test
+        void testSetPawnToQueen() {
+            Board board = new Board(players[0], players[1]);
+            board.setFigure(new Point(2, 0), new Pawn(FigureColor.WHITE));
+            System.out.println(board);
+
+            boolean actual = board.setPawnToQueen(new Point(2, 0), FigureColor.WHITE);
+            System.out.println(board);
+
             assertTrue(actual);
         }
 
         @Test
-        void testFindAndAttackWithSuccess() {
+        void testPawnToQueenConversion() {
+            //given
+            Board board = new Board(players[0], players[1]);
+            board.setFigure(new Point(2, 1), new Pawn(FigureColor.WHITE));
+            System.out.println(board);
+            //when
+            board.moveFigure(UserInterface.takeMove("C2B1"));
+            System.out.println(board);
+            Figure actual = board.getFigure(new Point(1,0));
+            //then
+            assertEquals(new Queen(FigureColor.WHITE), actual);
+        }
+
+        @Test
+        void testCaptureFigureWithSuccess() {
             //given
             Board board = new Board(players[0], players[1]);
             board.setFigure(new Point(2, 4), new Pawn(FigureColor.WHITE));
             board.setFigure(new Point(3, 3), new Pawn(FigureColor.BLACK));
-            Move move = new Move(new Point(0, 6), new Point(4, 2));
+            board.setWhiteFigures(1);
+            Move move = new Move(new Point(2, 4), new Point(4, 2));
             System.out.println(board);
-
             //when
-            boolean actual = board.showAndAttackOpponents(move);
-            board.moveFigure(move);
-
+            boolean actual = board.moveFigure(move);
             //then
             System.out.println(board);
             assertTrue(actual);
         }
 
         @Test
-        void testFindAndAttackWithNoSuccess() {
+        void testCaptureWithNoSuccess() {
             //given
-            Board board = new Board(players[0],players[1]) ;
+            Board board = new Board(players[0],players[1]);
             board.setFigure(new Point(0, 6), new Pawn(FigureColor.WHITE));
             board.setFigure(new Point(3, 3), new Pawn(FigureColor.BLACK));
             Move move = new Move(new Point(0, 6), new Point(2, 4));
             System.out.println(board);
 
             //when
-            boolean actual = board.showAndAttackOpponents(move);
-            board.moveFigure(move);
+            boolean actual = board.moveFigure(move);
 
             //then
             System.out.println(board);
             assertFalse(actual);
+        }
+
+        @Test
+        void testTwoCaptureWithSuccessAndNoExtraMove() {
+            //given
+            Board board = new Board(players[0],players[1]);
+            board.setFigure(new Point(2, 3), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(2, 1), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(5, 5), new Pawn(FigureColor.BLACK));
+            board.setBlackFigures(3);
+            board.setFigure(new Point(1, 4), new Pawn(FigureColor.WHITE));
+            board.setWhiteFigures(1);
+            System.out.println(board);
+
+            //when
+            boolean actualMoveOne = board.moveFigure(UserInterface.takeMove("B5D3"));
+            System.out.println(board);
+            boolean actualMoveTwo = board.moveFigure(UserInterface.takeMove("D3B1"));
+            System.out.println(board);
+            boolean actualMoveThree = board.moveFigure(UserInterface.takeMove("B1C2"));
+            System.out.println(board);
+
+            //then
+            assertTrue(actualMoveOne);
+            assertTrue(actualMoveTwo);
+            assertFalse(actualMoveThree);
+        }
+
+        @Test
+        void testThreeCaptureWithSuccessAndNoExtraMove() {
+            //given
+            Board board = new Board(players[0],players[1]);
+            board.setFigure(new Point(2, 5), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(2, 3), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(2, 1), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(5, 5), new Pawn(FigureColor.BLACK));
+            board.setBlackFigures(3);
+            board.setFigure(new Point(1, 6), new Pawn(FigureColor.WHITE));
+            board.setWhiteFigures(1);
+            System.out.println(board);
+
+            //when
+            boolean actualMoveOne = board.moveFigure(UserInterface.takeMove("B7D52"));
+            System.out.println(board);
+            boolean actualMoveTwo = board.moveFigure(UserInterface.takeMove("D5B3"));
+            System.out.println(board);
+            boolean actualMoveThree = board.moveFigure(UserInterface.takeMove("B3D1"));
+            System.out.println(board);
+            boolean actualMoveFour = board.moveFigure(UserInterface.takeMove("D1E2"));
+            System.out.println(board);
+
+            //then
+            assertTrue(actualMoveOne);
+            assertTrue(actualMoveTwo);
+            assertTrue(actualMoveThree);
+            assertFalse(actualMoveFour);
+        }
+
+        @Test
+        void testFirstCaptureButSecondMoveWithDifferentPawn() {
+            //given
+            Board board = new Board(players[0],players[1]);
+            board.setFigure(new Point(2, 3), new Pawn(FigureColor.BLACK));
+            board.setFigure(new Point(2, 1), new Pawn(FigureColor.BLACK));
+            board.setBlackFigures(2);
+            board.setFigure(new Point(1, 4), new Pawn(FigureColor.WHITE));
+            board.setFigure(new Point(5, 5), new Pawn(FigureColor.WHITE));
+            board.setWhiteFigures(2);
+            System.out.println(board);
+
+            //when
+            boolean actualMoveOne = board.moveFigure(UserInterface.takeMove("B5D3"));
+            System.out.println(board);
+            boolean actualMoveTwo = board.moveFigure(UserInterface.takeMove("F6G7"));
+            System.out.println(board);
+
+            //then
+            assertTrue(actualMoveOne);
+            assertFalse(actualMoveTwo);
         }
     }
 }

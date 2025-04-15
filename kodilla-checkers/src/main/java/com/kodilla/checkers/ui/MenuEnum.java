@@ -58,7 +58,13 @@ public class MenuEnum {
     }
 
     public enum ComputerLevelEnum {
-        EASY,
-        HARD
+        EASY(1),
+        HARD(3);
+
+        public final int level;
+
+        ComputerLevelEnum(int level) {
+            this.level = level;
+        }
     }
 }

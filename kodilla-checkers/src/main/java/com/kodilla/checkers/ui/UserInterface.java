@@ -1,6 +1,5 @@
 package com.kodilla.checkers.ui;
 
-import com.kodilla.checkers.figures.Figure;
 import com.kodilla.checkers.figures.FigureColor;
 import com.kodilla.checkers.logic.Move;
 
@@ -113,12 +112,12 @@ public class UserInterface {
         System.out.printf(UIStrings.WINNER, playerName);
     }
 
-    public static void showDraw() {
-        System.out.println(UIStrings.DRAW);
-    }
-
     public static void illegalMove() {
         System.out.println(UIStrings.ILLEGAL_MOVE);
+    }
+
+    public static void continueMove() {
+        System.out.println(UIStrings.CONTINUE_MOVE);
     }
 
     private static boolean isCorrectMoveName(String move) {

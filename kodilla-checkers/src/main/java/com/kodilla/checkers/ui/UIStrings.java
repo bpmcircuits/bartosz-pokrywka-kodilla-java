@@ -32,6 +32,7 @@ public class UIStrings {
     public static String PLACE_YOUR_MOVE = "Place your move (i.e. A6B5): ";
     public static String WRONG_MOVE_NAME = "Wrong move name!";
     public static String ILLEGAL_MOVE = "Illegal move!";
+    public static String CONTINUE_MOVE = "Please continue your move from last point";
     public static String WINNER = "Player %s won!%n";
     public static String DRAW = "Draw!";
 }
