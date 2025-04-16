@@ -1,0 +1,23 @@
+{
+    "car_name":"laguna",
+    "car_brand":"renault",
+    "description":[
+        {
+            "material":"soft_fabric",
+            "color":"beige"
+        },
+        {
+            "material":"leather",
+            "color":"black"
+        },
+        {
+            "material":"steel",
+            "color":"silver"
+        },
+        {
+            "material":"wood",
+            "color":"light_brown"
+        },
+    ],
+    "engine_capacity":2.0
+}

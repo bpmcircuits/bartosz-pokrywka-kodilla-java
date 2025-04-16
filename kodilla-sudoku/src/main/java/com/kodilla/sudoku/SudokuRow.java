@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SudokuRow {
 
-    private List<SudokuElement> cols = new ArrayList<>();
+    private final List<SudokuElement> cols = new ArrayList<>();
     private static final int COLUMN_SIZE = 9;
 
     public SudokuRow() {
