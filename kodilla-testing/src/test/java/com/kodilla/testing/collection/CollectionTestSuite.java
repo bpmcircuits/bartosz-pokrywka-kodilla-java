@@ -39,4 +39,25 @@ public class CollectionTestSuite {
 
         assertEquals(expectedResult, oddNumbersExterminator.exterminate(numbers));
     }
+
+    @Test
+    @DisplayName("Test digits remover for an empty list.")
+    void testDigitsRemoverEmptyList() {
+        List<Integer> emptyList = new ArrayList<>();
+
+        DigitsRemover digitsRemover = new DigitsRemover();
+
+        assertNull(digitsRemover.removeDigits(emptyList));
+    }
+
+    @Test
+    @DisplayName("Test digits remover for a list with various numbers.")
+    void testDigitsRemoverNormalList() {
+        List<Integer> numbers = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 20, 100);
+        DigitsRemover digitsRemover = new DigitsRemover();
+
+        List<Integer> expectedResult = List.of(10, 11, 12, 20, 100);
+
+        assertEquals(expectedResult, digitsRemover.removeDigits(numbers));
+    }
 }

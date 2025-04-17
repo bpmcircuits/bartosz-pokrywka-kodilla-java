@@ -7,7 +7,7 @@ public class SudokuElement {
 
     public static int EMPTY = -1;
     private int value;
-    private List<Integer> possibleValues = new ArrayList<>();
+    private List<Integer> possibleValues = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9));
 
     public SudokuElement() {
         this.value = EMPTY;
