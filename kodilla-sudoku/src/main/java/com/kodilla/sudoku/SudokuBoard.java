@@ -16,10 +16,6 @@ public class SudokuBoard {
         }
     }
 
-    public SudokuBoard initBoard() {
-        return this;
-    }
-
     public int getNumber(Point point) {
         if (point == null) return -1;
         return rows.get(point.y).getCols().get(point.x).getValue();
@@ -30,143 +26,145 @@ public class SudokuBoard {
         rows.get(point.y).getCols().get(point.x).setValue(number);
     }
 
-    public boolean sudokuAlgorithm() {
-        boolean atLeastOneOperationPerformed = true;
-        do {
-            atLeastOneOperationPerformed = false;
-            for (int col = 0; col < SUDOKU_SIZE; col++) {
-                for (int row = 0; row < SUDOKU_SIZE; row++) {
-                    if (getNumber(new Point(col, row)) != SudokuElement.EMPTY) {
+    public boolean solveSudoku() {
+        boolean progress = true;
+        while (progress) {
+            progress = false;
+            for (int row = 0; row < SUDOKU_SIZE; row++) {
+                for (int col = 0; col < SUDOKU_SIZE; col++) {
+                    Point currentPosition = new Point(col, row);
+                    if (getNumber(currentPosition) != SudokuElement.EMPTY) {
                         continue;
                     }
-                    List<Integer> possibleValues = rows.get(row).getCols().get(col).getPossibleValues();
-                    possibleValues.removeAll(checkForRow(row));
-                    possibleValues.removeAll(checkForColumn(col));
-                    possibleValues.removeAll(checkForBlock(col, row));
-                    System.out.println("Możliwe wartości dla pola " + col + " i " + row + " to " + possibleValues);
+
+                    SudokuElement cell = getCellAt(currentPosition);
+                    List<Integer> possibleValues = cell.getPossibleValues();
+                    possibleValues.removeAll(getValuesInRow(row));
+                    possibleValues.removeAll(getValuesInColumn(col));
+                    possibleValues.removeAll(getValuesInBlock(col, row));
+
+                    System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
+
                     if (possibleValues.size() == 1) {
                         int valueToSet = possibleValues.getFirst();
-                        Point point = new Point(col, row);
-
-                        if (checkForMorePossibilitiesError(row, valueToSet, col)) return false;
-
-                        setNumber(point, valueToSet);
-                        atLeastOneOperationPerformed = true;
+                        if (wouldCauseConflict(row, col, valueToSet)) {
+                            return false;
+                        }
+                        setNumber(currentPosition, valueToSet);
+                        progress = true;
+                        continue;
                     }
-                    Integer uniqueValue = findUniqueValueForPoint(new Point(col, row));
+
+                    Integer uniqueValue = findUniqueValueForCell(currentPosition);
                     if (uniqueValue != null) {
-                        setNumber(new Point(col, row), uniqueValue);
-                        atLeastOneOperationPerformed = true;
+                        setNumber(currentPosition, uniqueValue);
+                        progress = true;
                     }
                 }
             }
-
-        } while (atLeastOneOperationPerformed);
-
-        return checkForCompleteSudoku();
+        }
+        return isSudokuComplete();
     }
 
-    public Integer findUniqueValueForPoint(Point point) {
-        SudokuElement current = rows.get(point.y).getCols().get(point.x);
-        if (current.getValue() != SudokuElement.EMPTY) return null;
+    private SudokuElement getCellAt(Point position) {
+        return rows.get(position.y).getCols().get(position.x);
+    }
 
-        List<Integer> possibleValues = current.getPossibleValues();
-
-        for (int candidate : possibleValues) {
-            boolean uniqueInRow = true;
-            for (int x = 0; x < SUDOKU_SIZE; x++) {
-                if (x == point.x) continue;
-                SudokuElement other = rows.get(point.y).getCols().get(x);
-                if (other.getValue() == SudokuElement.EMPTY && other.getPossibleValues().contains(candidate)) {
-                    uniqueInRow = false;
-                    break;
-                }
-            }
-            if (uniqueInRow) return candidate;
-
-            boolean uniqueInColumn = true;
-            for (int y = 0; y < SUDOKU_SIZE; y++) {
-                if (y == point.y) continue;
-                SudokuElement other = rows.get(y).getCols().get(point.x);
-                if (other.getValue() == SudokuElement.EMPTY && other.getPossibleValues().contains(candidate)) {
-                    uniqueInColumn = false;
-                    break;
-                }
-            }
-            if (uniqueInColumn) return candidate;
-
-            boolean uniqueInBlock = true;
-            int startCol = (point.x / 3) * 3;
-            int startRow = (point.y / 3) * 3;
-            for (int dx = 0; dx < 3; dx++) {
-                for (int dy = 0; dy < 3; dy++) {
-                    int x = startCol + dx;
-                    int y = startRow + dy;
-                    if (x == point.x && y == point.y) continue;
-                    SudokuElement other = rows.get(y).getCols().get(x);
-                    if (other.getValue() == SudokuElement.EMPTY && other.getPossibleValues().contains(candidate)) {
-                        uniqueInBlock = false;
-                        break;
-                    }
-                }
-                if (!uniqueInBlock) break;
-            }
-            if (uniqueInBlock) return candidate;
+    public Integer findUniqueValueForCell(Point position) {
+        SudokuElement current = getCellAt(position);
+        if (current.getValue() != SudokuElement.EMPTY) {
+            return null;
         }
 
+        List<Integer> possibleValues = current.getPossibleValues();
+        for (int candidate : possibleValues) {
+            if (isUniqueInRegion(position, candidate, RegionType.ROW) ||
+                    isUniqueInRegion(position, candidate, RegionType.COLUMN) ||
+                    isUniqueInRegion(position, candidate, RegionType.BLOCK)) {
+                return candidate;
+            }
+        }
         return null;
     }
 
-    private boolean checkForMorePossibilitiesError(int row, int valueToSet, int col) {
-        boolean existsInRow = checkForRow(row).contains(valueToSet);
-        boolean existsInColumn = checkForColumn(col).contains(valueToSet);
-        boolean existsInSquare = checkForBlock(col, row).contains(valueToSet);
+    private enum RegionType { ROW, COLUMN, BLOCK }
 
-        if (existsInRow || existsInColumn || existsInSquare) {
-            System.err.println("KONFLIKT: Wartość " + valueToSet + " na pozycji (" + col + "," + row + ") już istnieje w:");
-            if (existsInRow) System.err.println(" - wierszu " + row);
-            if (existsInColumn) System.err.println(" - kolumnie " + col);
-            if (existsInSquare) System.err.println(" - kwadracie 3x3");
+    private boolean isUniqueInRegion(Point position, int candidate, RegionType regionType) {
+        int startX, startY, endX, endY;
 
+        switch (regionType) {
+            case ROW:
+                startX = 0;
+                endX = SUDOKU_SIZE;
+                startY = position.y;
+                endY = position.y + 1;
+                break;
+            case COLUMN:
+                startX = position.x;
+                endX = position.x + 1;
+                startY = 0;
+                endY = SUDOKU_SIZE;
+                break;
+            case BLOCK:
+                startX = (position.x / 3) * 3;
+                endX = startX + 3;
+                startY = (position.y / 3) * 3;
+                endY = startY + 3;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown region type");
+        }
+
+        for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX; x++) {
+                if (x == position.x && y == position.y) {
+                    continue;
+                }
+                SudokuElement other = rows.get(y).getCols().get(x);
+                if (other.getValue() == SudokuElement.EMPTY &&
+                        other.getPossibleValues().contains(candidate)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean wouldCauseConflict(int row, int col, int value) {
+        boolean existsInRow = getValuesInRow(row).contains(value);
+        boolean existsInColumn = getValuesInColumn(col).contains(value);
+        boolean existsInBlock = getValuesInBlock(col, row).contains(value);
+
+        if (existsInRow || existsInColumn || existsInBlock) {
+            System.err.println("CONFLICT: Value " + value + " at position (" + col + "," + row + ") already exists in:");
+            if (existsInRow) System.err.println(" - row " + row);
+            if (existsInColumn) System.err.println(" - column " + col);
+            if (existsInBlock) System.err.println(" - 3x3 block");
             return true;
         }
         return false;
     }
 
-    private boolean checkForCompleteSudoku() {
-        for (int col = 0; col < SUDOKU_SIZE; col++) {
-            for (int row = 0; row < SUDOKU_SIZE; row++) {
+    private boolean isSudokuComplete() {
+        for (int row = 0; row < SUDOKU_SIZE; row++) {
+            for (int col = 0; col < SUDOKU_SIZE; col++) {
                 if (getNumber(new Point(col, row)) == SudokuElement.EMPTY) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
-    public List<Integer> checkForRow(int rowIndex) {
+    public List<Integer> getValuesInRow(int rowIndex) {
         return collectNonEmptyValues(i -> new Point(i, rowIndex));
     }
 
-
-    public List<Integer> checkForColumn(int colIndex) {
+    public List<Integer> getValuesInColumn(int colIndex) {
         return collectNonEmptyValues(i -> new Point(colIndex, i));
     }
 
-
-    private List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
-        List<Integer> values = new ArrayList<>();
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
-            int number = getNumber(pointMapper.apply(i));
-            if (number != SudokuElement.EMPTY) {
-                values.add(number);
-            }
-        }
-        return values;
-    }
-
-
-    public List<Integer> checkForBlock(int colIndex, int rowIndex) {
+    public List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
         List<Integer> values = new ArrayList<>();
         int startCol = (colIndex / 3) * 3;
         int startRow = (rowIndex / 3) * 3;
@@ -180,6 +178,18 @@ public class SudokuBoard {
         }
         return values;
     }
+
+    private List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
+        List<Integer> values = new ArrayList<>();
+        for (int i = 0; i < SUDOKU_SIZE; i++) {
+            int number = getNumber(pointMapper.apply(i));
+            if (number != SudokuElement.EMPTY) {
+                values.add(number);
+            }
+        }
+        return values;
+    }
+
 
     @Override
     public String toString() {
