@@ -1,33 +1,18 @@
 package com.kodilla.sudoku;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class SudokuBoard {
+public class SudokuSolver {
 
-    private final List<SudokuRow> rows = new ArrayList<>();
-    private static final int SUDOKU_SIZE = 9;
+    private SudokuBoard board;
+    private final int SUDOKU_SIZE;
 
-    public SudokuBoard() {
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
-            rows.add(new SudokuRow());
-        }
-    }
-
-    public int getNumber(Point point) {
-        if (point == null) return -1;
-        return rows.get(point.y).getCols().get(point.x).getValue();
-    }
-
-    public void setNumber(Point point, int number) {
-        if (point == null) return;
-        rows.get(point.y).getCols().get(point.x).setValue(number);
-    }
-
-    public SudokuElement getCellAt(Point position) {
-        return rows.get(position.y).getCols().get(position.x);
+    public SudokuSolver(SudokuBoard board, int SUDOKU_SIZE) {
+        this.board = board;
+        this.SUDOKU_SIZE = SUDOKU_SIZE;
     }
 
     public boolean solveSudoku() {
@@ -39,21 +24,21 @@ public class SudokuBoard {
                     Point currentPosition = new Point(col, row);
                     if (isElementEmpty(currentPosition)) continue;
 
-                    List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
+                    java.util.List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
 
                     System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
 
                     if (possibleValues.size() == 1) {
                         int valueToSet = possibleValues.getFirst();
                         if (wouldCauseConflict(row, col, valueToSet)) return false;
-                        setNumber(currentPosition, valueToSet);
+                        board.setNumber(currentPosition, valueToSet);
                         progress = true;
                         continue;
                     }
 
                     Integer uniqueValue = findUniqueValueForCell(currentPosition);
                     if (uniqueValue != null) {
-                        setNumber(currentPosition, uniqueValue);
+                        board.setNumber(currentPosition, uniqueValue);
                         progress = true;
                     }
                 }
@@ -62,39 +47,40 @@ public class SudokuBoard {
         return isSudokuComplete();
     }
 
-    private List<Integer> removeRepeatingValues(Point currentPosition, int row, int col) {
-        SudokuElement cell = getCellAt(currentPosition);
-        List<Integer> possibleValues = cell.getPossibleValues();
+    public java.util.List<Integer> removeRepeatingValues(Point currentPosition, int row, int col) {
+        SudokuElement cell = board.getCellAt(currentPosition);
+        java.util.List<Integer> possibleValues = cell.getPossibleValues();
         possibleValues.removeAll(getValuesInRow(row));
         possibleValues.removeAll(getValuesInColumn(col));
         possibleValues.removeAll(getValuesInBlock(col, row));
         return possibleValues;
     }
 
-    private boolean isElementEmpty(Point currentPosition) {
-        return getNumber(currentPosition) != SudokuElement.EMPTY;
+    public boolean isElementEmpty(Point currentPosition) {
+        return board.getNumber(currentPosition) != SudokuElement.EMPTY;
     }
 
+
     public Integer findUniqueValueForCell(Point position) {
-        SudokuElement current = getCellAt(position);
+        SudokuElement current = board.getCellAt(position);
         if (current.getValue() != SudokuElement.EMPTY) {
             return null;
         }
 
-        List<Integer> possibleValues = current.getPossibleValues();
+        java.util.List<Integer> possibleValues = current.getPossibleValues();
         for (int candidate : possibleValues) {
-            if (isUniqueInRegion(position, candidate, RegionType.ROW) ||
-                    isUniqueInRegion(position, candidate, RegionType.COLUMN) ||
-                    isUniqueInRegion(position, candidate, RegionType.BLOCK)) {
+            if (isUniqueInRegion(position, candidate, SudokuSolver.RegionType.ROW) ||
+                    isUniqueInRegion(position, candidate, SudokuSolver.RegionType.COLUMN) ||
+                    isUniqueInRegion(position, candidate, SudokuSolver.RegionType.BLOCK)) {
                 return candidate;
             }
         }
         return null;
     }
 
-    private enum RegionType { ROW, COLUMN, BLOCK }
+    public enum RegionType { ROW, COLUMN, BLOCK }
 
-    private boolean isUniqueInRegion(Point position, int candidate, RegionType regionType) {
+    public boolean isUniqueInRegion(Point position, int candidate, SudokuSolver.RegionType regionType) {
         int startX, startY, endX, endY;
 
         switch (regionType) {
@@ -125,7 +111,7 @@ public class SudokuBoard {
                 if (x == position.x && y == position.y) {
                     continue;
                 }
-                SudokuElement other = rows.get(y).getCols().get(x);
+                SudokuElement other = board.getCellAt(new Point(x, y));
                 if (other.getValue() == SudokuElement.EMPTY &&
                         other.getPossibleValues().contains(candidate)) {
                     return false;
@@ -135,7 +121,7 @@ public class SudokuBoard {
         return true;
     }
 
-    private boolean wouldCauseConflict(int row, int col, int value) {
+    public boolean wouldCauseConflict(int row, int col, int value) {
         boolean existsInRow = getValuesInRow(row).contains(value);
         boolean existsInColumn = getValuesInColumn(col).contains(value);
         boolean existsInBlock = getValuesInBlock(col, row).contains(value);
@@ -150,10 +136,10 @@ public class SudokuBoard {
         return false;
     }
 
-    private boolean isSudokuComplete() {
+    public boolean isSudokuComplete() {
         for (int row = 0; row < SUDOKU_SIZE; row++) {
             for (int col = 0; col < SUDOKU_SIZE; col++) {
-                if (getNumber(new Point(col, row)) == SudokuElement.EMPTY) {
+                if (board.getNumber(new Point(col, row)) == SudokuElement.EMPTY) {
                     return false;
                 }
             }
@@ -161,21 +147,21 @@ public class SudokuBoard {
         return true;
     }
 
-    public List<Integer> getValuesInRow(int rowIndex) {
+    public java.util.List<Integer> getValuesInRow(int rowIndex) {
         return collectNonEmptyValues(i -> new Point(i, rowIndex));
     }
 
-    public List<Integer> getValuesInColumn(int colIndex) {
+    public java.util.List<Integer> getValuesInColumn(int colIndex) {
         return collectNonEmptyValues(i -> new Point(colIndex, i));
     }
 
-    public List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
-        List<Integer> values = new ArrayList<>();
+    public java.util.List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
+        java.util.List<Integer> values = new ArrayList<>();
         int startCol = (colIndex / 3) * 3;
         int startRow = (rowIndex / 3) * 3;
         for (int i = startCol; i < startCol + 3; i++) {
             for (int j = startRow; j < startRow + 3; j++) {
-                int number = getNumber(new Point(i, j));
+                int number = board.getNumber(new Point(i, j));
                 if (number != SudokuElement.EMPTY) {
                     values.add(number);
                 }
@@ -184,30 +170,14 @@ public class SudokuBoard {
         return values;
     }
 
-    private List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
+    public java.util.List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
         List<Integer> values = new ArrayList<>();
         for (int i = 0; i < SUDOKU_SIZE; i++) {
-            int number = getNumber(pointMapper.apply(i));
+            int number = board.getNumber(pointMapper.apply(i));
             if (number != SudokuElement.EMPTY) {
                 values.add(number);
             }
         }
         return values;
     }
-
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("+-------+-------+-------+\n");
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
-            sb.append(rows.get(i).toString());
-            sb.append("\n");
-            if ((i + 1) % 3 == 0)
-                sb.append("+-------+-------+-------+\n");
-        }
-        return sb.toString();
-    }
-
-
 }

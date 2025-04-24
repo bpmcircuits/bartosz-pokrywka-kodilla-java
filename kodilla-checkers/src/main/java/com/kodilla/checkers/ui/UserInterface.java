@@ -145,4 +145,7 @@ public class UserInterface {
         return new Move(new Point(fromCol, fromRow), new Point(toCol, toRow));
     }
 
+    public static void captureAvailable() {
+        System.out.println(UIStrings.CAPTURE_AVAILABLE);
+    }
 }

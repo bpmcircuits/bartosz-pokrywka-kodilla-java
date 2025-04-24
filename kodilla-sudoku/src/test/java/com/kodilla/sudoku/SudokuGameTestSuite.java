@@ -114,17 +114,23 @@ class SudokuGameTestSuite {
             assertEquals(5, actual);
 
         }
+    }
+
+    @DisplayName("Tests for SudokuSolver class")
+    @Nested
+    class testsSudokuSolver {
 
         @Test
         void testCheckForRow() {
             //given
             SudokuBoard board = new SudokuBoard();
+            SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(1, 0), 2);
             board.setNumber(new Point(3, 0), 5);
             board.setNumber(new Point(6, 0), 7);
             board.setNumber(new Point(8, 0), 9);
             //when
-            List<Integer> actual = board.getValuesInRow(0);
+            List<Integer> actual = sudokuSolver.getValuesInRow(0);
             //then
             System.out.println(board);
             assertEquals(List.of(2, 5, 7, 9), actual);
@@ -135,12 +141,13 @@ class SudokuGameTestSuite {
         void testCheckForColumn() {
             //given
             SudokuBoard board = new SudokuBoard();
+            SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(0, 2), 8);
             board.setNumber(new Point(0, 4), 6);
             board.setNumber(new Point(0, 6), 2);
             board.setNumber(new Point(0, 8), 1);
             //when
-            List<Integer> actual = board.getValuesInColumn(0);
+            List<Integer> actual = sudokuSolver.getValuesInColumn(0);
             //then
             System.out.println(board);
             assertEquals(List.of(8, 6, 2, 1), actual);
@@ -151,6 +158,7 @@ class SudokuGameTestSuite {
             //given
             List<Integer> expected = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
             SudokuBoard board = new SudokuBoard();
+            SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(0, 0), 1);
             board.setNumber(new Point(1, 0), 2);
             board.setNumber(new Point(2, 0), 3);
@@ -161,9 +169,9 @@ class SudokuGameTestSuite {
             board.setNumber(new Point(1, 2), 8);
             board.setNumber(new Point(2, 2), 9);
             //when
-            List<Integer> actual = board.getValuesInBlock(0, 0);
-            List<Integer> actualTwo = board.getValuesInBlock(1, 1);
-            List<Integer> actualThree = board.getValuesInBlock(2, 2);
+            List<Integer> actual = sudokuSolver.getValuesInBlock(0, 0);
+            List<Integer> actualTwo = sudokuSolver.getValuesInBlock(1, 1);
+            List<Integer> actualThree = sudokuSolver.getValuesInBlock(2, 2);
             //then
             System.out.println(board);
             assertTrue(expected.containsAll(actual));
@@ -174,8 +182,10 @@ class SudokuGameTestSuite {
         @Test
         void testAlgorithm() {
             //given
+            SudokuSolver sudokuSolver = new SudokuSolver(sudokuBoard, 9);
+            //when then
             System.out.println(sudokuBoard);
-            sudokuBoard.solveSudoku();
+            sudokuSolver.solveSudoku();
             System.out.println(sudokuBoard);
         }
     }

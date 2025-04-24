@@ -3,6 +3,7 @@ package com.kodilla.checkers.player;
 import com.kodilla.checkers.figures.*;
 import com.kodilla.checkers.logic.Board;
 import com.kodilla.checkers.logic.Move;
+import com.kodilla.checkers.logic.MoveValidator;
 import com.kodilla.checkers.ui.MenuEnum;
 
 import java.util.List;
@@ -26,8 +27,9 @@ public class ComputerPlayer implements Player {
     private Move findBestMove(Board board) {
         int bestScore = Integer.MIN_VALUE;
         Move bestMove = null;
+        MoveValidator moveValidator = new MoveValidator(board);
 
-        for (Move move : board.getAllLegalMoves(color)) {
+        for (Move move : moveValidator.getAllLegalMoves(color)) {
             Board boardCopy = board.deepCopy();
             boolean captureOccurred = boardCopy.moveFigure(move);
 
@@ -51,8 +53,10 @@ public class ComputerPlayer implements Player {
             return board.evaluateScore(color);
         }
 
+        MoveValidator moveValidator = new MoveValidator(board);
         FigureColor currentColor = isMaximizing ? color : getOpponentColor(color);
-        List<Move> moves = board.getAllLegalMoves(currentColor);
+        List<Move> moves = moveValidator.getAllLegalMoves(currentColor);
+
 
         if (moves.isEmpty()) {
             return board.evaluateScore(color);

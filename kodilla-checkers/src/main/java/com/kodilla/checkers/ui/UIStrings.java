@@ -35,4 +35,5 @@ public class UIStrings {
     public static String CONTINUE_MOVE = "Please continue your move from last point";
     public static String WINNER = "Player %s won!%n";
     public static String DRAW = "Draw!";
+    public static String CAPTURE_AVAILABLE = "Capture is available!";
 }
