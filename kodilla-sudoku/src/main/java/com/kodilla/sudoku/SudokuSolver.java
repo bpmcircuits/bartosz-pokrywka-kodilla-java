@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 public class SudokuSolver {
 
-    private SudokuBoard board;
+    private final SudokuBoard board;
     private final int SUDOKU_SIZE;
 
     public SudokuSolver(SudokuBoard board, int SUDOKU_SIZE) {
@@ -15,68 +15,24 @@ public class SudokuSolver {
         this.SUDOKU_SIZE = SUDOKU_SIZE;
     }
 
-//    public boolean fullSolve() {
-//        if (solve()) {
-//            if (isSudokuComplete()) return true;
-//        }
-//        return solveWithBacktracking();
-//    }
-
-    public boolean solveWithBacktrackingAndLogic() {
-        // najpierw zastosuj logikę eliminacji
-        if (!solve()) return false;
-
-        for (int row = 0; row < SUDOKU_SIZE; row++) {
-            for (int col = 0; col < SUDOKU_SIZE; col++) {
-                Point currentPosition = new Point(col, row);
-
-                if (board.getNumber(currentPosition) == SudokuElement.EMPTY) {
-                    List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
-
-                    for (int value : possibleValues) {
-                        if (!wouldCauseConflict(row, col, value)) {
-                            board.setNumber(currentPosition, value);
-
-                            // rekurencja + znów próbuj rozwiązać logicznie
-                            if (solveWithBacktrackingAndLogic()) {
-                                return true;
-                            } else {
-                                board.setNumber(currentPosition, SudokuElement.EMPTY);
-                            }
-                        }
-                    }
-                    return false; // żadna wartość nie pasuje
-                }
-            }
+    public boolean solveFullPuzzle() {
+        if (solveWithLogicOnly()) {
+            return true;
         }
-
-        return isSudokuComplete();
+        return solveWithBacktracking();
     }
 
-    public boolean solve() {
+    private boolean solveWithLogicOnly() {
         boolean progress = true;
         while (progress) {
             progress = false;
             for (int row = 0; row < SUDOKU_SIZE; row++) {
                 for (int col = 0; col < SUDOKU_SIZE; col++) {
                     Point currentPosition = new Point(col, row);
-                    if (isElementEmpty(currentPosition)) continue;
-
-                    List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
-
-                    //System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
-
-                    if (possibleValues.size() == 1) {
-                        int valueToSet = possibleValues.getFirst();
-                        if (wouldCauseConflict(row, col, valueToSet)) return false;
-                        board.setNumber(currentPosition, valueToSet);
-                        progress = true;
+                    if (!isElementEmpty(currentPosition)) {
                         continue;
                     }
-
-                    Integer uniqueValue = findUniqueValueForCell(currentPosition);
-                    if (uniqueValue != null) {
-                        board.setNumber(currentPosition, uniqueValue);
+                    if (tryFillCellWithLogic(currentPosition, row, col)) {
                         progress = true;
                     }
                 }
@@ -84,6 +40,66 @@ public class SudokuSolver {
         }
         return isSudokuComplete();
     }
+
+    private boolean tryFillCellWithLogic(Point position, int row, int col) {
+        List<Integer> possibleValues = findPossibleValues(position, row, col);
+        if (possibleValues.size() == 1) {
+            int valueToSet = possibleValues.getFirst();
+            if (wouldCauseConflict(row, col, valueToSet)) {
+                return false;
+            }
+            board.setNumber(position, valueToSet);
+            return true;
+        }
+
+        Integer uniqueValue = findUniqueValueForCell(position);
+        if (uniqueValue != null) {
+            board.setNumber(position, uniqueValue);
+            return true;
+        }
+
+        return false;
+    }
+
+    private List<Integer> findPossibleValues(Point position, int row, int col) {
+        return removeRepeatingValues(position, row, col);
+    }
+
+    private boolean solveWithBacktracking() {
+        Point emptyCell = findFirstEmptyCell();
+        if (emptyCell == null) {
+            return true;
+        }
+
+        int row = emptyCell.y;
+        int col = emptyCell.x;
+
+        List<Integer> possibleValues = findPossibleValues(emptyCell, row, col);
+        for (int value : possibleValues) {
+            if (wouldCauseConflict(row, col, value)) {
+                continue;
+            }
+            board.setNumber(emptyCell, value);
+            if (solveFullPuzzle()) {
+                return true;
+            }
+            board.setNumber(emptyCell, SudokuElement.EMPTY);
+        }
+        return false;
+    }
+
+    private Point findFirstEmptyCell() {
+        for (int row = 0; row < SUDOKU_SIZE; row++) {
+            for (int col = 0; col < SUDOKU_SIZE; col++) {
+                Point position = new Point(col, row);
+                if (isElementEmpty(position)) {
+                    return position;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public List<Integer> removeRepeatingValues(Point currentPosition, int row, int col) {
         SudokuElement cell = board.getCellAt(currentPosition);
@@ -95,7 +111,7 @@ public class SudokuSolver {
     }
 
     public boolean isElementEmpty(Point currentPosition) {
-        return board.getNumber(currentPosition) != SudokuElement.EMPTY;
+        return board.getNumber(currentPosition) == SudokuElement.EMPTY;
     }
 
 

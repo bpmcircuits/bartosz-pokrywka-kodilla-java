@@ -2,7 +2,6 @@ package com.kodilla.sudoku;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Scanner;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
@@ -28,7 +27,7 @@ public class SudokuGame {
             System.out.println(board);
             List<Integer> cordsAndNumbers = UserInterface.chooseNumbersOrSolve();
             if (cordsAndNumbers == null) {
-                solver.solveWithBacktrackingAndLogic();
+                solver.solveFullPuzzle();
                 System.out.println(board);
                 return;
             } else {
