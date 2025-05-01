@@ -28,7 +28,8 @@ public class SudokuGame {
             System.out.println(board);
             List<Integer> cordsAndNumbers = UserInterface.chooseNumbersOrSolve();
             if (cordsAndNumbers == null) {
-                solver.solve();
+                solver.solveWithBacktrackingAndLogic();
+                System.out.println(board);
                 return;
             } else {
                 setNumbersToBoard(board, cordsAndNumbers);
@@ -37,14 +38,13 @@ public class SudokuGame {
     }
 
     private void setNumbersToBoard(SudokuBoard board, List<Integer> cordsAndNumbers) {
+
+        if (!cordsAndNumbers.stream().allMatch(n -> n >= 0 && n <= board.getSudokuSize())) {
+            UserInterface.wrongNumber();
+            return;
+        }
+
         List<List <Integer>> numberGroups = IntStream.range(0, cordsAndNumbers.size() / 3)
-                .map(i -> {
-                    if (cordsAndNumbers.get(i) < 0 || cordsAndNumbers.get(i) > board.getSudokuSize()) {
-                        UserInterface.wrongNumber();
-                        return i;
-                    }
-                    return i;
-                })
                 .mapToObj(getGroupsOfThree(cordsAndNumbers))
                 .toList();
 

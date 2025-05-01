@@ -15,6 +15,44 @@ public class SudokuSolver {
         this.SUDOKU_SIZE = SUDOKU_SIZE;
     }
 
+//    public boolean fullSolve() {
+//        if (solve()) {
+//            if (isSudokuComplete()) return true;
+//        }
+//        return solveWithBacktracking();
+//    }
+
+    public boolean solveWithBacktrackingAndLogic() {
+        // najpierw zastosuj logikę eliminacji
+        if (!solve()) return false;
+
+        for (int row = 0; row < SUDOKU_SIZE; row++) {
+            for (int col = 0; col < SUDOKU_SIZE; col++) {
+                Point currentPosition = new Point(col, row);
+
+                if (board.getNumber(currentPosition) == SudokuElement.EMPTY) {
+                    List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
+
+                    for (int value : possibleValues) {
+                        if (!wouldCauseConflict(row, col, value)) {
+                            board.setNumber(currentPosition, value);
+
+                            // rekurencja + znów próbuj rozwiązać logicznie
+                            if (solveWithBacktrackingAndLogic()) {
+                                return true;
+                            } else {
+                                board.setNumber(currentPosition, SudokuElement.EMPTY);
+                            }
+                        }
+                    }
+                    return false; // żadna wartość nie pasuje
+                }
+            }
+        }
+
+        return isSudokuComplete();
+    }
+
     public boolean solve() {
         boolean progress = true;
         while (progress) {
@@ -26,7 +64,7 @@ public class SudokuSolver {
 
                     List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
 
-                    System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
+                    //System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
 
                     if (possibleValues.size() == 1) {
                         int valueToSet = possibleValues.getFirst();
