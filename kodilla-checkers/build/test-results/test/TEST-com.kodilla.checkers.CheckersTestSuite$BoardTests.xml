@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Board Tests" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-04-24T15:05:41" hostname="iMac-Bart" time="0.003">
+<testsuite name="Board Tests" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-04-26T22:12:38" hostname="iMac-Bart" time="0.003">
   <properties/>
   <testcase name="testSimpleDeepCopy()" classname="com.kodilla.checkers.CheckersTestSuite$BoardTests" time="0.001"/>
   <testcase name="testDeepCopy()" classname="com.kodilla.checkers.CheckersTestSuite$BoardTests" time="0.001"/>

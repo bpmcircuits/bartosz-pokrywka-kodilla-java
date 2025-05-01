@@ -15,7 +15,7 @@ public class SudokuSolver {
         this.SUDOKU_SIZE = SUDOKU_SIZE;
     }
 
-    public boolean solveSudoku() {
+    public boolean solve() {
         boolean progress = true;
         while (progress) {
             progress = false;
@@ -24,7 +24,7 @@ public class SudokuSolver {
                     Point currentPosition = new Point(col, row);
                     if (isElementEmpty(currentPosition)) continue;
 
-                    java.util.List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
+                    List<Integer> possibleValues = removeRepeatingValues(currentPosition, row, col);
 
                     System.out.println("Possible values for cell at (" + col + "," + row + "): " + possibleValues);
 
@@ -47,9 +47,9 @@ public class SudokuSolver {
         return isSudokuComplete();
     }
 
-    public java.util.List<Integer> removeRepeatingValues(Point currentPosition, int row, int col) {
+    public List<Integer> removeRepeatingValues(Point currentPosition, int row, int col) {
         SudokuElement cell = board.getCellAt(currentPosition);
-        java.util.List<Integer> possibleValues = cell.getPossibleValues();
+        List<Integer> possibleValues = cell.getPossibleValues();
         possibleValues.removeAll(getValuesInRow(row));
         possibleValues.removeAll(getValuesInColumn(col));
         possibleValues.removeAll(getValuesInBlock(col, row));
@@ -67,7 +67,7 @@ public class SudokuSolver {
             return null;
         }
 
-        java.util.List<Integer> possibleValues = current.getPossibleValues();
+        List<Integer> possibleValues = current.getPossibleValues();
         for (int candidate : possibleValues) {
             if (isUniqueInRegion(position, candidate, SudokuSolver.RegionType.ROW) ||
                     isUniqueInRegion(position, candidate, SudokuSolver.RegionType.COLUMN) ||
@@ -147,16 +147,16 @@ public class SudokuSolver {
         return true;
     }
 
-    public java.util.List<Integer> getValuesInRow(int rowIndex) {
+    public List<Integer> getValuesInRow(int rowIndex) {
         return collectNonEmptyValues(i -> new Point(i, rowIndex));
     }
 
-    public java.util.List<Integer> getValuesInColumn(int colIndex) {
+    public List<Integer> getValuesInColumn(int colIndex) {
         return collectNonEmptyValues(i -> new Point(colIndex, i));
     }
 
-    public java.util.List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
-        java.util.List<Integer> values = new ArrayList<>();
+    public List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
+        List<Integer> values = new ArrayList<>();
         int startCol = (colIndex / 3) * 3;
         int startRow = (rowIndex / 3) * 3;
         for (int i = startCol; i < startCol + 3; i++) {
@@ -170,7 +170,7 @@ public class SudokuSolver {
         return values;
     }
 
-    public java.util.List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
+    public List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
         List<Integer> values = new ArrayList<>();
         for (int i = 0; i < SUDOKU_SIZE; i++) {
             int number = board.getNumber(pointMapper.apply(i));

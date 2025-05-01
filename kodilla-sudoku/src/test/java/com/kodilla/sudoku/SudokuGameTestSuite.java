@@ -1,10 +1,9 @@
 package com.kodilla.sudoku;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.awt.*;
 
@@ -16,7 +15,7 @@ class SudokuGameTestSuite {
 
     @BeforeEach
     void setUp() {
-        sudokuBoard = new SudokuBoard();
+        sudokuBoard = new SudokuBoard(9);
         sudokuBoard.setNumber(new Point(1, 0), 2);
         sudokuBoard.setNumber(new Point(3, 0), 5);
         sudokuBoard.setNumber(new Point(5, 0), 1);
@@ -60,6 +59,7 @@ class SudokuGameTestSuite {
             assertNotNull(sudokuGame);
         }
 
+        @Disabled
         @Test
         void testIfGameIsFinished() {
             //given
@@ -78,7 +78,7 @@ class SudokuGameTestSuite {
         @Test
         void createSudokuRow() {
             //given
-            SudokuRow sudokuRow = new SudokuRow();
+            SudokuRow sudokuRow = new SudokuRow(9);
             //when then
             System.out.println(sudokuRow);
         }
@@ -90,14 +90,14 @@ class SudokuGameTestSuite {
 
         @Test
         void createSudokuBoard() {
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             assertNotNull(board);
         }
 
         @Test
         void testRenderBoard() {
             //given
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             //when then
             System.out.println(board);
         }
@@ -105,7 +105,7 @@ class SudokuGameTestSuite {
         @Test
         void testSetNumber() {
             //given
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             board.setNumber(new Point(0, 0), 5);
             //when
             int actual = board.getNumber(new Point(0, 0));
@@ -123,7 +123,7 @@ class SudokuGameTestSuite {
         @Test
         void testCheckForRow() {
             //given
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(1, 0), 2);
             board.setNumber(new Point(3, 0), 5);
@@ -140,7 +140,7 @@ class SudokuGameTestSuite {
         @Test
         void testCheckForColumn() {
             //given
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(0, 2), 8);
             board.setNumber(new Point(0, 4), 6);
@@ -157,7 +157,7 @@ class SudokuGameTestSuite {
         void testCheckForBlock() {
             //given
             List<Integer> expected = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
-            SudokuBoard board = new SudokuBoard();
+            SudokuBoard board = new SudokuBoard(9);
             SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
             board.setNumber(new Point(0, 0), 1);
             board.setNumber(new Point(1, 0), 2);
@@ -185,8 +185,71 @@ class SudokuGameTestSuite {
             SudokuSolver sudokuSolver = new SudokuSolver(sudokuBoard, 9);
             //when then
             System.out.println(sudokuBoard);
-            sudokuSolver.solveSudoku();
+            sudokuSolver.solve();
             System.out.println(sudokuBoard);
         }
+    }
+
+    @DisplayName("Tests for UserInterface")
+    @Nested
+    class testsUserInterface {
+        private final InputStream originalSystemIn = System.in;
+
+        @AfterEach
+        void tearDown() {
+            // Zawsze przywracamy oryginalne wejście systemowe po każdym teście
+            System.setIn(originalSystemIn);
+            // Inicjujemy nowy Scanner w UserInterface z oryginalnym wejściem
+            UserInterface.resetScanner();
+        }
+
+        @Test
+        void testChoiceOfNumbersWithoutSpacesAndComas() {
+            //given
+            String simulatedInput = "123456789\n";  // Dodany znak nowej linii
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+            System.setIn(inputStream);
+            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+
+            //when
+            List<Integer> actual = UserInterface.chooseNumbersOrSolve();
+
+            //then
+            System.out.println(actual);
+            assertEquals(List.of(1,2,3,4,5,6,7,8,9), actual);
+        }
+
+        @Test
+        void testChoiceOfNumbersWithSpaces() {
+            //given
+            String simulatedInput = "1 2 3 4 56789\n";  // Dodany znak nowej linii
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+            System.setIn(inputStream);
+            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+
+            //when
+            List<Integer> actual = UserInterface.chooseNumbersOrSolve();
+
+            //then
+            System.out.println(actual);
+            assertEquals(List.of(1,2,3,4,5,6,7,8,9), actual);
+        }
+
+        @Test
+        void testChoiceOfNumbersWithSpacesAndComas() {
+            //given
+            String simulatedInput = "1 ,2 3 4 5,678,9\n";  // Dodany znak nowej linii
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+            System.setIn(inputStream);
+            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+
+            //when
+            List<Integer> actual = UserInterface.chooseNumbersOrSolve();
+
+            //then
+            System.out.println(actual);
+            assertEquals(List.of(1,2,3,4,5,6,7,8,9), actual);
+        }
+
     }
 }

@@ -6,9 +6,10 @@ import java.util.List;
 public class SudokuRow {
 
     private final List<SudokuElement> cols = new ArrayList<>();
-    private static final int COLUMN_SIZE = 9;
+    private final int columnSize;
 
-    public SudokuRow() {
+    public SudokuRow(int columnSize) {
+        this.columnSize = columnSize;
         for (int i = 0; i < 9; i++) {
             cols.add(new SudokuElement());
         }
@@ -22,7 +23,7 @@ public class SudokuRow {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("| ");
-        for (int col = 0; col < COLUMN_SIZE; col++) {
+        for (int col = 0; col < columnSize; col++) {
             sb.append(cols.get(col).toString()).append(" ");
             if ((col + 1) % 3 == 0) sb.append("| ");
         }

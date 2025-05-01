@@ -3,16 +3,16 @@ package com.kodilla.sudoku;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 
 public class SudokuBoard {
 
     private final List<SudokuRow> rows = new ArrayList<>();
-    private static final int SUDOKU_SIZE = 9;
+    private final int sudokuSize;
 
-    public SudokuBoard() {
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
-            rows.add(new SudokuRow());
+    public SudokuBoard(int sudokuSize) {
+        this.sudokuSize = sudokuSize;
+        for (int i = 0; i < sudokuSize; i++) {
+            rows.add(new SudokuRow(sudokuSize));
         }
     }
 
@@ -30,46 +30,15 @@ public class SudokuBoard {
         return rows.get(position.y).getCols().get(position.x);
     }
 
-    public List<Integer> getValuesInRow(int rowIndex) {
-        return collectNonEmptyValues(i -> new Point(i, rowIndex));
+    public int getSudokuSize() {
+        return sudokuSize;
     }
-
-    public List<Integer> getValuesInColumn(int colIndex) {
-        return collectNonEmptyValues(i -> new Point(colIndex, i));
-    }
-
-    public List<Integer> getValuesInBlock(int colIndex, int rowIndex) {
-        List<Integer> values = new ArrayList<>();
-        int startCol = (colIndex / 3) * 3;
-        int startRow = (rowIndex / 3) * 3;
-        for (int i = startCol; i < startCol + 3; i++) {
-            for (int j = startRow; j < startRow + 3; j++) {
-                int number = getNumber(new Point(i, j));
-                if (number != SudokuElement.EMPTY) {
-                    values.add(number);
-                }
-            }
-        }
-        return values;
-    }
-
-    private List<Integer> collectNonEmptyValues(Function<Integer, Point> pointMapper) {
-        List<Integer> values = new ArrayList<>();
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
-            int number = getNumber(pointMapper.apply(i));
-            if (number != SudokuElement.EMPTY) {
-                values.add(number);
-            }
-        }
-        return values;
-    }
-
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("+-------+-------+-------+\n");
-        for (int i = 0; i < SUDOKU_SIZE; i++) {
+        for (int i = 0; i < sudokuSize; i++) {
             sb.append(rows.get(i).toString());
             sb.append("\n");
             if ((i + 1) % 3 == 0)
