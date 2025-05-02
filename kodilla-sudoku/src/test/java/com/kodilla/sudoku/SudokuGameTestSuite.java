@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.*;
 
@@ -185,7 +186,7 @@ class SudokuGameTestSuite {
             SudokuSolver sudokuSolver = new SudokuSolver(sudokuBoard, 9);
             //when then
             System.out.println(sudokuBoard);
-            sudokuSolver.solve();
+            sudokuSolver.solveFullPuzzle();
             System.out.println(sudokuBoard);
         }
     }
@@ -197,19 +198,17 @@ class SudokuGameTestSuite {
 
         @AfterEach
         void tearDown() {
-            // Zawsze przywracamy oryginalne wejście systemowe po każdym teście
             System.setIn(originalSystemIn);
-            // Inicjujemy nowy Scanner w UserInterface z oryginalnym wejściem
             UserInterface.resetScanner();
         }
 
         @Test
         void testChoiceOfNumbersWithoutSpacesAndComas() {
             //given
-            String simulatedInput = "123456789\n";  // Dodany znak nowej linii
+            String simulatedInput = "123456789\n";
             ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
             System.setIn(inputStream);
-            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+            UserInterface.resetScanner();
 
             //when
             List<Integer> actual = UserInterface.chooseNumbersOrSolve();
@@ -222,10 +221,10 @@ class SudokuGameTestSuite {
         @Test
         void testChoiceOfNumbersWithSpaces() {
             //given
-            String simulatedInput = "1 2 3 4 56789\n";  // Dodany znak nowej linii
+            String simulatedInput = "1 2 3 4 56789\n";
             ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
             System.setIn(inputStream);
-            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+            UserInterface.resetScanner();
 
             //when
             List<Integer> actual = UserInterface.chooseNumbersOrSolve();
@@ -238,10 +237,10 @@ class SudokuGameTestSuite {
         @Test
         void testChoiceOfNumbersWithSpacesAndComas() {
             //given
-            String simulatedInput = "1 ,2 3 4 5,678,9\n";  // Dodany znak nowej linii
+            String simulatedInput = "1 ,2 3 4 5,678,9\n";
             ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
             System.setIn(inputStream);
-            UserInterface.resetScanner(); // Inicjuje nowy Scanner z aktualnym System.in
+            UserInterface.resetScanner();
 
             //when
             List<Integer> actual = UserInterface.chooseNumbersOrSolve();
@@ -251,5 +250,25 @@ class SudokuGameTestSuite {
             assertEquals(List.of(1,2,3,4,5,6,7,8,9), actual);
         }
 
+        @Test
+        void testFillAndSolve() {
+            //given
+            String simulatedInput = "115123157216241258265329338386418456493514548563591617652696726778844851869559587999\n";
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+            System.setIn(inputStream);
+            SudokuBoard board = new SudokuBoard(9);
+            SudokuSolver sudokuSolver = new SudokuSolver(board, 9);
+            SudokuGame sudokuGame = new SudokuGame();
+            List<Integer> cordsAndNumbers = UserInterface.chooseNumbersOrSolve();
+            //when
+            assertNotNull(cordsAndNumbers);
+            sudokuGame.setNumbersToBoard(board, cordsAndNumbers);
+            System.out.println(board);
+            //then
+            boolean actual = sudokuSolver.solveFullPuzzle();
+            System.out.println(board);
+            assertTrue(actual);
+
+        }
     }
 }

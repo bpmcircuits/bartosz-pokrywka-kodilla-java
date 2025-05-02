@@ -36,7 +36,7 @@ public class SudokuGame {
         }
     }
 
-    private void setNumbersToBoard(SudokuBoard board, List<Integer> cordsAndNumbers) {
+    public void setNumbersToBoard(SudokuBoard board, List<Integer> cordsAndNumbers) {
 
         if (!cordsAndNumbers.stream().allMatch(n -> n >= 0 && n <= board.getSudokuSize())) {
             UserInterface.wrongNumber();
