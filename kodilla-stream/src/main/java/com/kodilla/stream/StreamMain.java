@@ -21,5 +21,7 @@ public class StreamMain {
         resultOfForumUsersById.entrySet()
                 .forEach(System.out::println);
 
+
+
     }
 }

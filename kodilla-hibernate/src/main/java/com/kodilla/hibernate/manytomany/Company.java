@@ -13,6 +13,11 @@ import java.util.List;
         resultClass = Company.class
 )
 
+@NamedQuery(
+        name = "Company.findByNameContaining",
+        query = "FROM Company WHERE name LIKE CONCAT('%', :PART_OF_NAME, '%')"
+)
+
 @Entity
 @Table(name = "COMPANIES")
 public class Company {

@@ -14,4 +14,7 @@ import java.util.List;
 public interface CompanyDao extends CrudRepository<Company, Integer> {
     @Query(nativeQuery = true)
     List<Company> findCompanyByThreeLetters(@Param("LETTERS") String letters);
+
+    @Query
+    List<Company> findByNameContaining(@Param("PART_OF_NAME") String partOfName);
 }
