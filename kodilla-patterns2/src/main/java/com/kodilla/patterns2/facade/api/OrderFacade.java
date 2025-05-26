@@ -4,18 +4,23 @@ import com.kodilla.patterns2.facade.ShopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
+@EnableAspectJAutoProxy
 public class OrderFacade {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderFacade.class);
     private final ShopService shopService;
+
     @Autowired
     public OrderFacade(ShopService shopService) {
         this.shopService = shopService;
     }
+
     public void processOrder(final OrderDTO order, final Long userId) throws OrderProcessingException {
         boolean wasError = false;
         Long orderId = shopService.openOrder(userId);
